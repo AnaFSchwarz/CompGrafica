@@ -1,7 +1,7 @@
 from tkinter import *
 from ponto import Ponto
 from reta import Reta
-from poligono import *
+from wireframe import *
 
 class App():
     def __init__(self):
@@ -31,6 +31,7 @@ class App():
 
         for item in ["Ponto", "Segmento de reta", "Wireframe"]:
             self.lista_objetos.insert(END, item)
+        self.lista_objetos.bind("<<ListboxSelect>>", self.selecao_objeto)
 
         # Frame para os botões de movimentação
         movimento_frame = Frame(menu_frame, bg="#808080")
@@ -48,12 +49,25 @@ class App():
         btn_baixo = Button(movimento_frame, text="BAIXO", width=10, height=2)
         btn_baixo.grid(row=2, column=1, padx=5, pady=5)
 
-
-        
         self.desenhar_eixo()
-        # self.desenha_formas()
 
         self.run()
+
+    def selecao_objeto(self, event):
+        # Pega o índice selecionado
+        idx = self.lista_objetos.curselection()
+        if not idx:
+            return  # nada selecionado
+        nome = self.lista_objetos.get(idx)
+        self.executar_objeto(nome)
+
+    def executar_objeto(self, nome):
+        if nome == "Ponto":
+            self.desenhar_ponto()
+        elif nome == "Segmento de reta":
+            self.desenhar_reta()
+        elif nome == "Wireframe":
+            self.desenhar_wireframe()
 
     def desenhar_eixo(self):
 
@@ -97,9 +111,10 @@ class App():
         pontos = Ponto(self.canvas, 50, 50)
         self.desenhar_eixo()
 
- #   def desenhar_poligono(self):
-  #     poligono = Poligono(self.canvas, )
-  #      self.desenhar_eixo()
+    def desenhar_wireframe(self):
+        pontos = [(150, 200), (200, 100), (250, 200), (200, 250)]
+        wireframe = Wireframe(self.canvas, pontos)
+        self.desenhar_eixo()
 
 
 

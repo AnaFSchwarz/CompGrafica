@@ -7,5 +7,7 @@ class Ponto():
 
         # Limpar window
         canva_desenho.delete("all")
-        r = 2
-        canva_desenho.create_oval(x-r, y-r, x+r, y+r, fill="black")
+        # Define raio do ponto
+        raio_pontos = 2
+        # Desenha o ponto no espaço canva
+        canva_desenho.create_oval(x-raio_pontos, y-raio_pontos, x+raio_pontos, y+raio_pontos, fill="black")
