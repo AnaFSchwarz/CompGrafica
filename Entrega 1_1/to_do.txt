@@ -27,4 +27,8 @@ Código para parsing:
 pontos: List[Tuple[float]] = list(eval([input string]))
 A transformada de viewport não deve distorcer os objetos. Ex.: Se um objeto for um quadrado, ele deve ser exibido como tal.
 
-
+TO DO para primeira entrega:
+- lista de objetos e funcao do botao
+- Zooming e funcao do botao
+- ajustar as proporcoes
+- funcao dos botoes de mover
