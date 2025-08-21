@@ -1,3 +1,3 @@
-import gui
+import app
 
-gui.App()
+app.App()

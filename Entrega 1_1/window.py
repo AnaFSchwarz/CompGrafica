@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 
-class window():
+class Window():
     def __init__(self, xmin=-350, xmax=350, ymin=-350, ymax= 50):
         self.xmin = xmin
         self.xmax = xmax
@@ -52,8 +52,8 @@ class window():
     def move_window_direira(self):
         # mover sempre 5 "casas"
         # reduz os x e xmin como param de limite
-        if (self.xmax + 5) >= 100:
-           aux = (self.xmax + 5) - 100
+        if (self.xmax + 5) >= 350:
+           aux = (self.xmax + 5) - 350
            self.xmax += aux
            self.xmin += aux
         else:
@@ -62,8 +62,8 @@ class window():
 
     def move_window_esquerda(self):
         # aumento os x e xmax como param de limite
-        if (self.xmin - 5) <= -100:
-           aux = (self.xmin - 5) + 100
+        if (self.xmin - 5) <= -350:
+           aux = (self.xmin - 5) + 350
            self.xmax -= aux
            self.xmin -= aux
         else:
@@ -72,8 +72,8 @@ class window():
 
     def move_window_cima(self):
         # reduz os y e ymin como param de limite
-        if (self.ymin - 5) <= -100:
-           aux = (self.ymin - 5) + 100
+        if (self.ymin - 5) <= -350:
+           aux = (self.ymin - 5) + 350
            self.ymax -= aux
            self.ymin -= aux
         else:
@@ -83,14 +83,30 @@ class window():
 
     def move_window_baixo(self):
         # aumento os y e ymax como param de limite
-        if (self.ymax + 5) >= 100:
-           aux = (self.ymax + 5) - 100
+        if (self.ymax + 5) >= 350:
+           aux = (self.ymax + 5) - 350
            self.ymax += aux
            self.ymin += aux
         else:
             self.ymax += 5
             self.ymin += 5
 
+    # Função de transformação do mundo para viewport
+    def world_to_viewport(self, xw, yw):
+
+        # Janela do mundo (coordenadas reais)
+        xw_min, xw_max = -350, 350
+        yw_min, yw_max = -350, 350
+     
+        # Viewport (pixels na tela)
+        #xv_min, xv_max = 50, 350
+        #yv_min, yv_max = 50, 350
+        xv_min, xv_max = self.tam_min, self.tam_max #2, 700
+        yv_min, yv_max = self.tam_min, self.tam_max
+
+        xv = xv_min + (xw - xw_min) * (xv_max - xv_min) / (xw_max - xw_min)
+        yv = yv_max - (yw - yw_min) * (yv_max - yv_min) / (yw_max - yw_min)
+        return xv, yv
 
 """
  messagebox.showinfo(self.root, "Partida abandonada. Você venceu!")

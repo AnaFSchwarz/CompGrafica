@@ -2,6 +2,7 @@ from tkinter import *
 from ponto import Ponto
 from reta import Reta
 from wireframe import *
+from window import Window
 
 class App():
     def __init__(self):
@@ -14,6 +15,7 @@ class App():
         self.canvas_height = 700
         self.canvas = Canvas(self.root, width=self.canvas_width, height= self.canvas_height, bg="white")
         self.canvas.pack(side="right", fill="both", expand=False)
+        self.window = Window()
         
         # Coluna de menu
         menu_frame = Frame(self.root, bg="#A29D9D", width=200)
@@ -28,7 +30,7 @@ class App():
         # Adicionar opções à lista
         # lista_objetos = ["Ponto", "Segmento de reta", "Wireframe"] 
 
-        for item in ["Ponto", "Segmento de reta", "Wireframe"]:
+        for item in ["Ponto", "Segmento de reta", "Wireframe", ">>limpar tela<<"]:
             self.lista_objetos.insert(END, item)
         self.lista_objetos.bind("<<ListboxSelect>>", self.selecao_objeto)
 
@@ -67,6 +69,10 @@ class App():
             self.desenhar_reta()
         elif nome == "Wireframe":
             self.desenhar_wireframe()
+        elif nome == ">>limpar tela<<":
+            self.canvas.delete("all")
+            self.desenhar_eixo()
+
 
     def desenhar_eixo(self):
 
@@ -91,28 +97,45 @@ class App():
         # Marcas no eixo X
         for x in range(0, largura, 50):
             self.canvas.create_line(x, cy-5, x, cy+5, fill="gray")
-            self.canvas.create_text(x, cy+15, text=str(x-cx), font=("Arial", 8))
+            #self.canvas.create_text(x, cy+15, text=str(x-cx), font=("Arial", 8))
         
         # Marcas no eixo Y
         for y in range(0, altura, 50):
             self.canvas.create_line(cx-5, y, cx+5, y, fill="gray")
-            self.canvas.create_text(cx+20, y, text=str(cy-y), font=("Arial", 8))
+            #self.canvas.create_text(cx+20, y, text=str(cy-y), font=("Arial", 8))
 
     def run(self):
         """Inicia loop da aplicação"""
         self.root.mainloop()
 
     def desenhar_reta(self):
-        retas = Reta(self.canvas, 4, 0 , 300, 200)
+        posicao = [(4, 0) , (300, 200)]
+        lista_pontos_viewport = []
+        for ponto in posicao:
+            xv, yv = self.window.world_to_viewport(ponto[0], ponto[1])
+            lista_pontos_viewport.append((xv,yv))
+
+        print("DEBUG pontos originais: ", posicao, " transformado ", lista_pontos_viewport)
+        retas = Reta(self.canvas, lista_pontos_viewport)
         self.desenhar_eixo()
 
     def desenhar_ponto(self):
-        pontos = Ponto(self.canvas, 50, 50)
+        posicao = [50,50]
+        xv, yv = self.window.world_to_viewport(posicao[0], posicao[1])
+        print("DEBUG pontos originais: ", posicao, " transformado ", xv, yv)
+        pontos = Ponto(self.canvas, xv, yv)
+
         self.desenhar_eixo()
 
     def desenhar_wireframe(self):
-        pontos = [(150, 200), (200, 100), (250, 200), (200, 250)]
-        wireframe = Wireframe(self.canvas, pontos)
+        posicao = [(150, 200), (200, 100), (250, 200), (200, 250)]
+        lista_pontos_viewport = []
+        for ponto in posicao:
+            xv, yv = self.window.world_to_viewport(ponto[0], ponto[1])
+            lista_pontos_viewport.append((xv,yv))
+        wireframe = Wireframe(self.canvas, lista_pontos_viewport)
+
+        print("DEBUG pontos originais: ", posicao, " transformado ", xv, yv)
         self.desenhar_eixo()
 
 
