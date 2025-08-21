@@ -9,7 +9,6 @@ class App():
         self.root.title("Sistema Gráfico Interativo 2D")
         self.root.geometry("1000x700")
 
-
         # Window
         self.canvas_width = 700
         self.canvas_height = 700
