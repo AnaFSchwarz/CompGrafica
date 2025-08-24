@@ -24,6 +24,7 @@ class App:
 
         # Display file
         self.display_file = []
+        self.lista_obj = []
 
         # Menu lateral
         self._criar_menu()
@@ -33,61 +34,81 @@ class App:
     def _criar_menu(self):
         menu_frame = Frame(self.root, bg="#A29D9D", width=200)
         menu_frame.pack(side="left", fill="y")
-        
+
         self.desenhar_eixos()
 
-         # frame selcionar objetos
-        Label(menu_frame, text="Objetos:", width=20, bg="#808080", fg="white", font=("Arial", 10, "bold")).pack(pady=(20, 5))
+        # --- Criar objeto ---
+        Label(menu_frame, text="Criar Objeto:", width=20, bg="#808080", fg="white",
+              font=("Arial", 10, "bold")).pack(pady=(20, 5))
 
-        self.lista_objetos = Listbox(menu_frame, height=5, width=40, exportselection=False)
+        criar_frame = Frame(menu_frame, bg="#808080")
+        criar_frame.pack(pady=5)
+
+        Button(criar_frame, text="Ponto", width=10, command=lambda: self.executar_objeto("Ponto")).grid(row=0, column=0, padx=2, pady=2)
+        Button(criar_frame, text="Reta", width=10, command=lambda: self.executar_objeto("Reta")).grid(row=0, column=1, padx=2, pady=2)
+        Button(criar_frame, text="Wireframe", width=10, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
+
+        # --- Lista de objetos criados ---
+        Label(menu_frame, text="Objetos criados:", width=20, bg="#808080", fg="white",
+              font=("Arial", 10, "bold")).pack(pady=(20, 5))
+
+        self.lista_objetos = Listbox(menu_frame, height=8, width=40, exportselection=False)
         self.lista_objetos.pack(padx=5)
-        for item in ["Ponto", "Reta", "Wireframe", ">>Limpar Tela<<"]:
-            self.lista_objetos.insert(END, item)
         self.lista_objetos.bind("<<ListboxSelect>>", self.selecao_objeto)
 
+        # --- Botão limpar tela ---
+        Button(menu_frame, text="Limpar Tela", width=20, height=2, command=self.limpar_tela).pack(pady=10)
 
-         # frame botões de movimento
+        # --- frame botões de movimento ---
         movimento_frame = Frame(menu_frame, bg="#808080")
-        movimento_frame.pack(pady=50)
+        movimento_frame.pack(pady=5)
 
-        btn_cima = Button(movimento_frame, text="CIMA", width=10, height=2, command=lambda: self.mover_window(0, self.window.get_tam()/8))
+        btn_cima = Button(movimento_frame, text="CIMA", width=10, height=2,
+                          command=lambda: self.mover_window(0, self.window.get_tam() / 8))
         btn_cima.grid(row=0, column=1, padx=5, pady=5)
 
-        btn_esquerda = Button(movimento_frame, text="ESQUERDA", width=10, height=2, command=lambda: self.mover_window(-self.window.get_tam()/8, 0))
-        btn_esquerda.grid(row=1, column=0, padx=(2,5), pady=5)
+        btn_esquerda = Button(movimento_frame, text="ESQUERDA", width=10, height=2,
+                              command=lambda: self.mover_window(-self.window.get_tam() / 8, 0))
+        btn_esquerda.grid(row=1, column=0, padx=(1), pady=5)
 
-        btn_centralizar = Button(movimento_frame, text="CENTRALIZAR", width=10, height=2, command= lambda: self.centralizar_window())
-        btn_centralizar.grid(row=1, column=1, padx=(2,5), pady=5)
+        btn_centralizar = Button(movimento_frame, text="CENTRALIZAR", width=10, height=2,
+                                 command=lambda: self.centralizar_window())
+        btn_centralizar.grid(row=1, column=1, padx=(1), pady=5)
 
-        btn_direita = Button(movimento_frame, text="DIREITA", width=10, height=2, command=lambda: self.mover_window(self.window.get_tam()/8, 0))
-        btn_direita.grid(row=1, column=2, padx=(2,5), pady=5)
+        btn_direita = Button(movimento_frame, text="DIREITA", width=10, height=2,
+                             command=lambda: self.mover_window(self.window.get_tam() / 8, 0))
+        btn_direita.grid(row=1, column=2, padx=(1), pady=5)
 
-        btn_baixo = Button(movimento_frame, text="BAIXO", width=10, height=2, command=lambda: self.mover_window(0, -self.window.get_tam()/8))
+        btn_baixo = Button(movimento_frame, text="BAIXO", width=10, height=2,
+                           command=lambda: self.mover_window(0, -self.window.get_tam() / 8))
         btn_baixo.grid(row=2, column=1, padx=5, pady=5)
 
-        # frame zoom
+        # --- frame zoom ---
         zoom_frame = Frame(menu_frame, bg="#808080", pady=5)
-        zoom_frame.pack(pady=5, padx = 15)  # Frame para agrupar os widgets na mesma linha
+        zoom_frame.pack(pady=5, padx=15)
 
-        Label(zoom_frame, text="Zoom(%): ", bg="#808080", fg="white", font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5)
+        Label(zoom_frame, text="Zoom(%): ", bg="#808080", fg="white",
+              font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5)
         self.zoom_entry = Entry(zoom_frame, width=5)
         self.zoom_entry.insert(0, "0")
         self.zoom_entry.grid(row=0, column=1, padx=0)
         btn_zoom = Button(zoom_frame, text="Aplicar Zoom", command=self.aplicar_zoom)
-        btn_zoom.grid(row=0, column=2, padx=50) 
+        btn_zoom.grid(row=0, column=2, padx=50)
+
+    def limpar_tela(self):
+        self.canvas.delete("all")
+        self.display_file.clear()
+        self.redesenhar()
 
     def mover_window(self, dx, dy):
-        """Movimenta a window e redesenha"""
-        self.window.mover(dx, dy)   # supondo que exista função mover na sua classe Window
+        self.window.mover(dx, dy)
         self.redesenhar()
-    
+
     def centralizar_window(self):
-        """Centralisa a window e redesenha"""
-        self.window.centralizar()   # supondo que exista função mover na sua classe Window
+        self.window.centralizar()
         self.redesenhar()
 
     def aplicar_zoom(self):
-        """Aplica o zoom com o fator digitado"""
         try:
             fator = float(self.zoom_entry.get())
             self.window.zoom(fator)
@@ -95,62 +116,80 @@ class App:
         except ValueError:
             print("Digite um número válido para o zoom")
 
-    def selecao_objeto(self, event):
-        idx = self.lista_objetos.curselection()
-        if not idx: return
-        nome = self.lista_objetos.get(idx)
-        self.executar_objeto(nome)
+    def executar_objeto(self, tipo):
+        if tipo == "Ponto":            
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o ponto:")
+            entrada = simpledialog.askstring("Ponto", "Digite o ponto no formato: (x,y)")
+            if entrada:
+                try:
+                    x, y = eval(entrada)
+                    ponto = Ponto([(x, y)])
+                    nome_final = nome_obj or f"Ponto{len(self.display_file) + 1}"
+                    self.lista_obj.append((nome_final, ponto))
+                    self.display_file.append((nome_final, ponto))
+                    self.lista_objetos.insert(END, nome_final)
+                except Exception:
+                    print("Entrada inválida!")
 
-    def executar_objeto(self, nome):
-        if nome == "Ponto":
-            x = simpledialog.askfloat("Coordenada X", "Digite X do ponto:")
-            y = simpledialog.askfloat("Coordenada Y", "Digite Y do ponto:")
-            if x is not None and y is not None:
-                self.display_file.append(Ponto([(x, y)]))
-        elif nome == "Reta":
-            x1 = simpledialog.askfloat("Reta", "Digite X do ponto inicial:")
-            y1 = simpledialog.askfloat("Reta", "Digite Y do ponto inicial:")
-            x2 = simpledialog.askfloat("Reta", "Digite X do ponto final:")
-            y2 = simpledialog.askfloat("Reta", "Digite Y do ponto final:")
-            if None not in (x1, y1, x2, y2):
-                self.display_file.append(Reta([(x1, y1), (x2, y2)]))
-        elif nome == "Wireframe":
-            pontos = []
-            n = simpledialog.askinteger("Wireframe", "Quantos pontos deseja inserir?")
-            if n is not None:
-                for i in range(n):
-                    x = simpledialog.askfloat(f"Ponto {i+1}", f"Digite X do ponto {i+1}:")
-                    y = simpledialog.askfloat(f"Ponto {i+1}", f"Digite Y do ponto {i+1}:")
-                    if x is None or y is None:
-                        return
-                    pontos.append((x, y))
-                self.display_file.append(Wireframe(pontos))
-        elif nome == ">>Limpar Tela<<":
-            self.display_file.clear()
+        elif tipo == "Reta":            
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para a reta:")
+            entrada = simpledialog.askstring("Reta", "Digite os pontos no formato: (x1,y1),(x2,y2)")
+            if entrada:
+                try:
+                    pontos = list(eval(f"[{entrada}]"))
+                    if len(pontos) == 2:
+                        reta = Reta(pontos)
+                        nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
+                        self.lista_obj.append((nome_final, reta))                        
+                        self.display_file.append((nome_final, reta))
+                        self.lista_objetos.insert(END, nome_final)
+                except Exception:
+                    print("Entrada inválida!")
+
+        elif tipo == "Wireframe":            
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o wireframe:")
+            entrada = simpledialog.askstring("Wireframe", "Digite os pontos no formato: (x1,y1),(x2,y2),...")
+            if entrada:
+                try:
+                    pontos = list(eval(f"[{entrada}]"))
+                    wire = Wireframe(pontos)
+                    nome_final = nome_obj or f"Wire{len(self.display_file) + 1}"
+                    self.lista_obj.append((nome_final, wire))
+                    self.display_file.append((nome_final, wire))
+                    self.lista_objetos.insert(END, nome_final)
+                except Exception:
+                    print("Entrada inválida!")
 
         self.redesenhar()
+    
+    def selecao_objeto(self, event):
+        """Desenha apenas o objeto selecionado na tela"""
+        idx = self.lista_objetos.curselection()
+        if not idx:
+            return
+        nome = self.lista_objetos.get(idx)
+        for nome_obj, obj in self.lista_obj:
+            if nome_obj == nome:
+                if (nome_obj, obj) not in self.display_file:
+                    self.display_file.append((nome_obj, obj))
+                self.redesenhar()
+                break
 
     def redesenhar(self):
         self.canvas.delete("all")
         self.desenhar_eixos()
-        # self.window.desenha_eixos(self.canvas, self.viewport)
-        for obj in self.display_file:
+        for nome, obj in self.display_file:
             obj.desenhar(self.canvas, self.window, self.viewport)
 
     def desenhar_eixos(self):
-        xv1, yv1 = self.viewport.world_to_viewport(0, -350, self.window)  # ponto inferior
-        xv2, yv2 = self.viewport.world_to_viewport(0, 350, self.window)   # ponto superior
-        self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2,arrow='last',)
+        xv1, yv1 = self.viewport.world_to_viewport(0, -350, self.window)
+        xv2, yv2 = self.viewport.world_to_viewport(0, 350, self.window)
+        self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
-        # Eixo X (horizontal)
-        xv1, yv1 = self.viewport.world_to_viewport(-350, 0, self.window)  # ponto esquerdo
-        xv2, yv2 = self.viewport.world_to_viewport(350, 0, self.window)   # ponto direito
-        self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last',)
+        xv1, yv1 = self.viewport.world_to_viewport(-350, 0, self.window)
+        xv2, yv2 = self.viewport.world_to_viewport(350, 0, self.window)
+        self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
     def run(self):
         self.root.mainloop()
-
-if __name__ == "__main__":
-    App()
-
 
