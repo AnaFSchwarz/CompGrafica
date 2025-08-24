@@ -119,11 +119,11 @@ class App:
 
     def executar_objeto(self, tipo):
         if tipo == "Ponto":            
-            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o ponto:")
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o ponto:", parent=self.root)
             if nome_obj is None:  
                 return 
 
-            entrada = simpledialog.askstring("Ponto", "Digite local do ponto no formato: (x,y)")
+            entrada = simpledialog.askstring("Ponto", "Digite local do ponto no formato: (x,y)", parent=self.root)
             if entrada:
                 try:
                     x, y = eval(entrada)
@@ -137,10 +137,10 @@ class App:
                     messagebox.showerror("Erro", "Entrada inválida!\nDigite no formato (x,y).")
 
         elif tipo == "Reta":            
-            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para a reta:")
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para a reta:", parent=self.root)
             if nome_obj is None:  
                 return 
-            entrada = simpledialog.askstring("Reta", "Digite os pontos no formato: (x1,y1),(x2,y2)")
+            entrada = simpledialog.askstring("Reta", "Digite os pontos no formato: (x1,y1),(x2,y2)" , parent=self.root)
             if entrada:
                 try:
                     pontos = list(eval(f"[{entrada}]"))
@@ -154,10 +154,10 @@ class App:
                      #print("Entrada inválida!")
                     messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2)")
         elif tipo == "Wireframe":            
-            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o wireframe:")
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o wireframe:", parent=self.root)
             if nome_obj is None:  
                 return  
-            entrada = simpledialog.askstring("Wireframe", "Digite os pontos no formato: (x1,y1),(x2,y2),...")
+            entrada = simpledialog.askstring("Wireframe", "Digite os pontos no formato: (x1,y1),(x2,y2),...", parent=self.root)
             if entrada:
                 try:
                     pontos = list(eval(f"[{entrada}]"))
