@@ -123,52 +123,73 @@ class App:
             if nome_obj is None:  
                 return 
 
-            entrada = simpledialog.askstring("Ponto", "Digite local do ponto no formato: (x,y)", parent=self.root)
-            if entrada:
-                try:
-                    x, y = eval(entrada)
-                    ponto = Ponto([(x, y)])
-                    nome_final = nome_obj or f"Ponto{len(self.display_file) + 1}"
-                    self.lista_obj.append((nome_final, ponto))
-                    self.display_file.append((nome_final, ponto))
-                    self.lista_objetos.insert(END, nome_final)
-                except Exception:
-                    #print("Entrada inválida!")
-                    messagebox.showerror("Erro", "Entrada inválida!\nDigite no formato (x,y).")
+            while True:
+                entrada = simpledialog.askstring("Ponto", "Digite local do ponto no formato: (x,y)", parent=self.root)
+                if entrada is None:  # usuário cancelou na segunda caixa
+                    return
+                if entrada.strip():
+                    try:
+                        x, y = eval(entrada)
+                        ponto = Ponto([(x, y)])
+                        nome_final = nome_obj or f"Ponto{len(self.display_file) + 1}"
+                        self.lista_obj.append((nome_final, ponto))
+                        self.display_file.append((nome_final, ponto))
+                        self.lista_objetos.insert(END, nome_final)
+                        break
+                    except Exception:
+                        #print("Entrada inválida!")
+                        messagebox.showerror("Erro", "Entrada inválida!\nDigite no formato (x,y).")
+                else:
+                        # Se o usuário só apertar Enter sem digitar nada
+                    messagebox.showerror( "Erro", "Você precisa digitar no formato (x,y).",parent=self.root )
 
         elif tipo == "Reta":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para a reta:", parent=self.root)
             if nome_obj is None:  
                 return 
-            entrada = simpledialog.askstring("Reta", "Digite os pontos no formato: (x1,y1),(x2,y2)" , parent=self.root)
-            if entrada:
-                try:
-                    pontos = list(eval(f"[{entrada}]"))
-                    if len(pontos) == 2:
-                        reta = Reta(pontos)
-                        nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
-                        self.lista_obj.append((nome_final, reta))                        
-                        self.display_file.append((nome_final, reta))
-                        self.lista_objetos.insert(END, nome_final)
-                except Exception:
-                     #print("Entrada inválida!")
-                    messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2)")
+            while True:
+                entrada = simpledialog.askstring("Reta", "Digite os pontos no formato: (x1,y1),(x2,y2)" , parent=self.root)
+                if entrada is None:  # usuário cancelou na segunda caixa
+                    return
+                if entrada.strip():
+                    try:
+                        pontos = list(eval(f"[{entrada}]"))
+                        if len(pontos) == 2:
+                            reta = Reta(pontos)
+                            nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
+                            self.lista_obj.append((nome_final, reta))                        
+                            self.display_file.append((nome_final, reta))
+                            self.lista_objetos.insert(END, nome_final)
+                            break
+                    except Exception:
+                        #print("Entrada inválida!")
+                        messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2)")
+                else:
+                        # Se o usuário só apertar Enter sem digitar nada
+                    messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2).",parent=self.root )
         elif tipo == "Wireframe":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o wireframe:", parent=self.root)
             if nome_obj is None:  
                 return  
-            entrada = simpledialog.askstring("Wireframe", "Digite os pontos no formato: (x1,y1),(x2,y2),...", parent=self.root)
-            if entrada:
-                try:
-                    pontos = list(eval(f"[{entrada}]"))
-                    wire = Wireframe(pontos)
-                    nome_final = nome_obj or f"Wire{len(self.display_file) + 1}"
-                    self.lista_obj.append((nome_final, wire))
-                    self.display_file.append((nome_final, wire))
-                    self.lista_objetos.insert(END, nome_final)
-                except Exception:
-                     #print("Entrada inválida!")
-                    messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2),...")
+            while True:
+                entrada = simpledialog.askstring("Wireframe", "Digite os pontos no formato: (x1,y1),(x2,y2),...", parent=self.root)
+                if entrada is None:  # usuário cancelou na segunda caixa
+                    return
+                if entrada:
+                    try:
+                        pontos = list(eval(f"[{entrada}]"))
+                        wire = Wireframe(pontos)
+                        nome_final = nome_obj or f"Wire{len(self.display_file) + 1}"
+                        self.lista_obj.append((nome_final, wire))
+                        self.display_file.append((nome_final, wire))
+                        self.lista_objetos.insert(END, nome_final)
+                        break
+                    except Exception:
+                        #print("Entrada inválida!")
+                        messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2),...")
+                else:
+                        # Se o usuário só apertar Enter sem digitar nada
+                    messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2),...",parent=self.root )
 
         self.redesenhar()
     
@@ -186,6 +207,7 @@ class App:
                 break
 
     def redesenhar(self):
+        print("DEBUG   redesenhou")
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
