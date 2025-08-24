@@ -18,8 +18,10 @@ No terminal, navegue até a pasta do projeto:
 
 ```bash
 cd caminho/para/seu/projeto
+```
 
 Execute o programa com:
 
 ```bash
 python3 main.py
+```
