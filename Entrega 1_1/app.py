@@ -4,7 +4,7 @@ from viewport import Viewport
 from ponto import Ponto
 from reta import Reta
 from wireframe import Wireframe
-from tkinter import simpledialog
+from tkinter import simpledialog, messagebox
 
 class App:
     def __init__(self):
@@ -114,12 +114,16 @@ class App:
             self.window.zoom(fator)
             self.redesenhar()
         except ValueError:
-            print("Digite um número válido para o zoom")
+            #print("Digite um número válido para o zoom")
+            messagebox.showerror("Erro","Digite um número válido para o zoom" )
 
     def executar_objeto(self, tipo):
         if tipo == "Ponto":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o ponto:")
-            entrada = simpledialog.askstring("Ponto", "Digite o ponto no formato: (x,y)")
+            if nome_obj is None:  
+                return 
+
+            entrada = simpledialog.askstring("Ponto", "Digite local do ponto no formato: (x,y)")
             if entrada:
                 try:
                     x, y = eval(entrada)
@@ -129,10 +133,13 @@ class App:
                     self.display_file.append((nome_final, ponto))
                     self.lista_objetos.insert(END, nome_final)
                 except Exception:
-                    print("Entrada inválida!")
+                    #print("Entrada inválida!")
+                    messagebox.showerror("Erro", "Entrada inválida!\nDigite no formato (x,y).")
 
         elif tipo == "Reta":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para a reta:")
+            if nome_obj is None:  
+                return 
             entrada = simpledialog.askstring("Reta", "Digite os pontos no formato: (x1,y1),(x2,y2)")
             if entrada:
                 try:
@@ -144,10 +151,12 @@ class App:
                         self.display_file.append((nome_final, reta))
                         self.lista_objetos.insert(END, nome_final)
                 except Exception:
-                    print("Entrada inválida!")
-
+                     #print("Entrada inválida!")
+                    messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2)")
         elif tipo == "Wireframe":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o wireframe:")
+            if nome_obj is None:  
+                return  
             entrada = simpledialog.askstring("Wireframe", "Digite os pontos no formato: (x1,y1),(x2,y2),...")
             if entrada:
                 try:
@@ -158,7 +167,8 @@ class App:
                     self.display_file.append((nome_final, wire))
                     self.lista_objetos.insert(END, nome_final)
                 except Exception:
-                    print("Entrada inválida!")
+                     #print("Entrada inválida!")
+                    messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2),...")
 
         self.redesenhar()
     
