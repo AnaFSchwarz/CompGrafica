@@ -1,15 +1,8 @@
+from objeto import ObjetoGrafico
 
-from tkinter import *
-
-class Reta():
-
-    def __init__(self, canva_desenho, lista_pontos):
-
-        self.lista_pontos = lista_pontos
-        
-        canva_desenho.delete("all")
-
-        x1, y1 = self.lista_pontos[0]
-        x2, y2 = self.lista_pontos[1]
-            # Desenha reta
-        canva_desenho.create_line(x1, y1, x2, y2, fill="black", width=2)
+class Reta(ObjetoGrafico):
+    def desenhar(self, canvas, window, viewport):
+        (x1, y1), (x2, y2) = self.pontos
+        xv1, yv1 = viewport.world_to_viewport(x1, y1, window)
+        xv2, yv2 = viewport.world_to_viewport(x2, y2, window)
+        canvas.create_line(xv1, yv1, xv2, yv2, fill="blue", width=2)

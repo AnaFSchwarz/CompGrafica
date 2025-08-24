@@ -1,30 +1,13 @@
+from objeto import ObjetoGrafico
 
-from tkinter import *
-
-class Wireframe():
-
-    # Desenha polígono apenas com pontos e linhas
-
-    def __init__(self, canva_desenho, lista_pontos):
-
-        self.lista_pontos = lista_pontos
-        
-        canva_desenho.delete("all")
-
-        raio_pontos = 2
-        n = len(self.lista_pontos)
-
+class Wireframe(ObjetoGrafico):
+    def desenhar(self, canvas, window, viewport):
+        n = len(self.pontos)
         for i in range(n):
-            x1, y1 = self.lista_pontos[i]
-            # Desenha o ponto
-            canva_desenho.create_oval(
-                x1 - raio_pontos, y1 - raio_pontos, x1 + raio_pontos, y1 + raio_pontos,
-                fill="blue", tags="poligono"
-            )
+            x1, y1 = self.pontos[i]
+            x2, y2 = self.pontos[(i+1) % n]  # conecta último com o primeiro
 
-            # Pega o próximo ponto (cíclico, último liga ao primeiro)
-            x2, y2 = self.lista_pontos[(i+1) % n]
-            # Desenha a linha
-            canva_desenho.create_line(
-                x1, y1, x2, y2, fill="blue", width=2, tags="poligono"
-            )
+            xv1, yv1 = viewport.world_to_viewport(x1, y1, window)
+            xv2, yv2 = viewport.world_to_viewport(x2, y2, window)
+
+            canvas.create_line(xv1, yv1, xv2, yv2, fill="green", width=2)
