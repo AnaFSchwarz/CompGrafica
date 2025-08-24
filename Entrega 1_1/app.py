@@ -109,13 +109,23 @@ class App:
         self.redesenhar()
 
     def aplicar_zoom(self):
+
         try:
-            fator = float(self.zoom_entry.get())
-            self.window.zoom(fator)
-            self.redesenhar()
+            valor = self.zoom_entry.get().strip()
+            # Verifica se é número inteiro
+            fator = int(valor)
+            # Verifica se está no intervalo permitido
+            if 0 <= fator <= 100:
+                self.window.zoom(fator)
+                self.redesenhar()
+            else:
+                messagebox.showerror(
+                    "Erro", "Digite um número inteiro entre 0 e 100.",
+                    parent=self.root)
+
         except ValueError:
-            #print("Digite um número válido para o zoom")
-            messagebox.showerror("Erro","Digite um número válido para o zoom" )
+            messagebox.showerror( "Erro", "Digite um número inteiro válido, entre 0 e 100.",
+                parent=self.root)
 
     def executar_objeto(self, tipo):
         if tipo == "Ponto":            
