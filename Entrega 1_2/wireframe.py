@@ -1,6 +1,7 @@
 from objeto import ObjetoGrafico
 
 class Wireframe(ObjetoGrafico):
+    
     def desenhar(self, canvas, window, viewport):
         n = len(self.pontos)
         for i in range(n):

@@ -55,6 +55,8 @@ class App:
         self.lista_objetos = Listbox(menu_frame, height=8, width=40, exportselection=False)
         self.lista_objetos.pack(padx=5)
         self.lista_objetos.bind("<<ListboxSelect>>", self.selecao_objeto)
+         # Bind: clique direito
+        self.lista_objetos.bind("<Button-3>", self.selecao_menu_objeto)
 
         # --- Botão limpar tela ---
         Button(menu_frame, text="Limpar Tela", width=20, height=2, command=self.limpar_tela).pack(pady=10)
@@ -216,8 +218,51 @@ class App:
                 self.redesenhar()
                 break
 
+    def selecao_menu_objeto(self, event):
+        """Abre menu do objeto ao clicar nele com botão direito"""
+
+        idx = self.lista_objetos.nearest(event.y)  # descobre em qual item foi clicado
+        if idx >= 0:
+            self.lista_objetos.selection_clear(0, END)
+            self.lista_objetos.selection_set(idx)
+            self.lista_objetos.activate(idx)
+
+            nome = self.lista_objetos.get(idx)
+             
+            menu = Menu(self.root, tearoff=0)
+            menu.add_command(label="Transladar", command=lambda: self.modificar_objeto("Transladar", nome))
+            menu.add_command(label="Escalonar", command=lambda: self.modificar_objeto("Escalonar", nome))
+            menu.add_command(label="Rotacionar", command=lambda: self.modificar_objeto("Rotacionar", nome))
+
+        # Abre o menu na posição do clique
+            menu.tk_popup(event.x_root, event.y_root)
+
+    def modificar_objeto(self, acao_escolhida, objeto):
+        
+        if acao_escolhida == "Transladar":
+            entrada = simpledialog.askstring(objeto, "Digite UM NOVO ponto no formato: (x1,y1)" , parent=self.root)
+            if entrada is None:  # usuário cancelou a caixa
+                    return
+            if entrada:
+                try:
+                       # IMPLEMENTAR TRANSLACAO
+                       pass
+                except Exception:
+                        #print("Entrada inválida!")
+                    messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x1,y1)")
+            else:
+                    # Se o usuário só apertar Enter sem digitar nada
+                messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1)",parent=self.root )
+            
+        elif acao_escolhida == "Escalonar":
+
+            pass
+        elif acao_escolhida == "Rotacionar":
+
+            pass
+     
+
     def redesenhar(self):
-        print("DEBUG   redesenhou")
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
