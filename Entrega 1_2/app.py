@@ -241,19 +241,19 @@ class App:
             
             # Adiciona menu para clique no objeto com botao direito
             menu = Menu(self.root, tearoff=0)
-            menu.add_command(label="Transladar", command=lambda: self.modificar_objeto("Transladar", objeto))
-            menu.add_command(label="Escalonar", command=lambda: self.modificar_objeto("Escalonar", objeto))
-            menu.add_command(label="Rotacionar", command=lambda: self.modificar_objeto("Rotacionar", objeto))
+            menu.add_command(label="Transladar", command=lambda: self.modificar_objeto("Transladar", objeto,nome))
+            menu.add_command(label="Escalonar", command=lambda: self.modificar_objeto("Escalonar", objeto,nome))
+            menu.add_command(label="Rotacionar", command=lambda: self.modificar_objeto("Rotacionar", objeto,nome))
 
         # Abre o menu na posição do clique
             menu.tk_popup(event.x_root, event.y_root)
 
-    def modificar_objeto(self, acao_escolhida, objeto):
+    def modificar_objeto(self, acao_escolhida, objeto,nome):
         
         if acao_escolhida == "Transladar":
 
             while True:
-                entrada = simpledialog.askstring(objeto, "Digite UM NOVO ponto no formato: (x1,y1)" , parent=self.root)
+                entrada = simpledialog.askstring(nome, "Digite UM NOVO ponto no formato: (x1,y1)" , parent=self.root)
                 if entrada is None:  # usuário cancelou a caixa
                     return
                 if entrada.strip():
