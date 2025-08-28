@@ -228,11 +228,22 @@ class App:
             self.lista_objetos.activate(idx)
 
             nome = self.lista_objetos.get(idx)
-             
+
+                    # Recupera o objeto associado a esse nome
+            objeto = None
+            for nome_obj, obj in self.lista_obj:
+                if nome_obj == nome:
+                    objeto = obj
+                    break
+
+            if objeto is None:
+                return  # não achou objeto correspondente
+            
+            # Adiciona menu para clique no objeto com botao direito
             menu = Menu(self.root, tearoff=0)
-            menu.add_command(label="Transladar", command=lambda: self.modificar_objeto("Transladar", nome))
-            menu.add_command(label="Escalonar", command=lambda: self.modificar_objeto("Escalonar", nome))
-            menu.add_command(label="Rotacionar", command=lambda: self.modificar_objeto("Rotacionar", nome))
+            menu.add_command(label="Transladar", command=lambda: self.modificar_objeto("Transladar", objeto))
+            menu.add_command(label="Escalonar", command=lambda: self.modificar_objeto("Escalonar", objeto))
+            menu.add_command(label="Rotacionar", command=lambda: self.modificar_objeto("Rotacionar", objeto))
 
         # Abre o menu na posição do clique
             menu.tk_popup(event.x_root, event.y_root)
@@ -240,19 +251,22 @@ class App:
     def modificar_objeto(self, acao_escolhida, objeto):
         
         if acao_escolhida == "Transladar":
-            entrada = simpledialog.askstring(objeto, "Digite UM NOVO ponto no formato: (x1,y1)" , parent=self.root)
-            if entrada is None:  # usuário cancelou a caixa
+
+            while True:
+                entrada = simpledialog.askstring(objeto, "Digite UM NOVO ponto no formato: (x1,y1)" , parent=self.root)
+                if entrada is None:  # usuário cancelou a caixa
                     return
-            if entrada:
-                try:
-                       # IMPLEMENTAR TRANSLACAO
-                       pass
-                except Exception:
-                        #print("Entrada inválida!")
-                    messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x1,y1)")
-            else:
-                    # Se o usuário só apertar Enter sem digitar nada
-                messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1)",parent=self.root )
+                if entrada.strip():
+                    try:
+                        dx, dy = map(int, entrada.strip("()").split(","))
+                        objeto.transladar(dx, dy)
+                        self.redesenhar()
+                        break
+                    except Exception:
+                        messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x1,y1)")
+                else:
+                        # Se o usuário só apertar Enter sem digitar nada
+                    messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1)",parent=self.root )
             
         elif acao_escolhida == "Escalonar":
 

@@ -10,10 +10,8 @@ class ObjetoGrafico(ABC):
 
     
     def transladar(self, dx, dy):
-        quantidade_pontos = len(self.pontos)
-        for i in range(quantidade_pontos):
-            self.pontos[i][0] += dx
-            self.pontos[i][1] += dy     
+        for i, (x, y) in enumerate(self.pontos):
+            self.pontos[i] = (x + dx, y + dy)  
 
     def escalonar(self, canvas):
         pass
