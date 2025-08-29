@@ -14,25 +14,26 @@ class ObjetoGrafico(ABC):
         xs = [p[0] for p in self.pontos]
         ys = [p[1] for p in self.pontos]
         return sum(xs)/len(xs), sum(ys)/len(ys)
-         
-    def transladar(self, dx, dy):
-        T = np.array([
-            [1, 0, dx],
-            [0, 1, dy],
-            [0, 0, 1]
-        ])
-        self.multiplicacao_matrizes(T)
-        
     
     def multiplicacao_matrizes(self, Matriz):
         novos_pontos = []
         for (x, y) in self.pontos:
+            # ponto como vetor linha
             ponto_h = np.array([x, y, 1])
-            ponto_trans = Matriz @ ponto_h
+        # multiplica ponto linha @ matriz
+            ponto_trans = ponto_h @ Matriz
             novos_pontos.append((ponto_trans[0], ponto_trans[1]))
         
         self.pontos = novos_pontos
-
+         
+    def transladar(self, dx, dy):
+        T = np.array([
+            [1, 0, 0],
+            [0, 1, 0],
+            [dx, dy, 1]
+        ])
+        self.multiplicacao_matrizes(T)
+        
     def escalonar(self, sx, sy):
         if not self.pontos:
             return
@@ -42,13 +43,17 @@ class ObjetoGrafico(ABC):
 
         cx, cy = self.centro()
 
-        T2 = np.array([[1, 0, -cx],
-                    [0, 1, -cy],
-                    [0, 0, 1]], dtype=float)
-        T1 = np.array([[1, 0, cx],
-                   [0, 1, cy],
-                   [0, 0, 1]], dtype=float)
+        # translação para origem
+        T1 = np.array([ [1, 0, 0],
+                        [0, 1, 0],
+                        [-cx, -cy, 1]], dtype=float)
+        
+        # translação de volta
+        T2 = np.array([ [1, 0, 0],
+                        [0, 1, 0],
+                        [cx, cy, 1]], dtype=float)
 
+        # escalonamento
         S  = np.array([[sx, 0,  0],
                        [0,  sy, 0],
                        [0,  0,  1]], dtype=float)
@@ -67,14 +72,14 @@ class ObjetoGrafico(ABC):
         ])
 
         # translação para origem
-        T2 = np.array([[1, 0, -cx],
-                   [0, 1, -cy],
-                   [0, 0, 1]], dtype=float)
+        T1 = np.array([[1, 0, 0],
+        [0, 1, 0],
+        [-cx, -cy, 1]], dtype=float)
 
         # translação de volta
-        T1 = np.array([[1, 0, cx],
-                   [0, 1, cy],
-                   [0, 0, 1]], dtype=float)
+        T2 = np.array([[1, 0, 0],
+            [0, 1, 0],
+            [cx, cy, 1]], dtype=float)
 
         # matriz resultante: T2 * R * T1
         M = T1 @ R @ T2
