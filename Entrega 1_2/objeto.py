@@ -3,8 +3,9 @@ import numpy as np
 import math
 
 class ObjetoGrafico(ABC):
-    def __init__(self, pontos):
+    def __init__(self, pontos, cor):
         self.pontos = pontos  # lista de pontos no mundo
+        self.cor = cor
 
     @abstractmethod
     def desenhar(self, canvas, window, viewport):

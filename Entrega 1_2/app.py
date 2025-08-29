@@ -5,6 +5,7 @@ from ponto import Ponto
 from reta import Reta
 from wireframe import Wireframe
 from tkinter import simpledialog, messagebox
+from tkinter.colorchooser import askcolor
 
 class App:
     def __init__(self):
@@ -139,17 +140,24 @@ class App:
                 entrada = simpledialog.askstring("Ponto", "Digite local do ponto no formato: (x,y)", parent=self.root)
                 if entrada is None:  # usuário cancelou na segunda caixa
                     return
+                
                 if entrada.strip():
                     try:
                         x, y = eval(entrada)
-                        ponto = Ponto([(x, y)])
+
+                        # Abre seletor de cor
+                        cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
+                        if cor_escolhida is None:  # se o usuário cancelar
+                            cor_escolhida = "#E11919"
+                        ponto = Ponto([(x, y)], cor = cor_escolhida)
                         nome_final = nome_obj or f"Ponto{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, ponto))
                         self.display_file.append((nome_final, ponto))
                         self.lista_objetos.insert(END, nome_final)
                         break
+
                     except Exception:
-                        #print("Entrada inválida!")
+                        
                         messagebox.showerror("Erro", "Entrada inválida!\nDigite no formato (x,y).")
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
@@ -166,8 +174,14 @@ class App:
                 if entrada.strip():
                     try:
                         pontos = list(eval(f"[{entrada}]"))
+
+                         # Abre seletor de cor
+                        cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
+                        if cor_escolhida is None:  # se o usuário cancelar
+                            cor_escolhida = "#E11919"
+
                         if len(pontos) == 2:
-                            reta = Reta(pontos)
+                            reta = Reta(pontos, cor = cor_escolhida)
                             nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
                             self.lista_obj.append((nome_final, reta))                        
                             self.display_file.append((nome_final, reta))
@@ -190,7 +204,14 @@ class App:
                 if entrada:
                     try:
                         pontos = list(eval(f"[{entrada}]"))
-                        wire = Wireframe(pontos)
+
+                         # Abre seletor de cor
+                        cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
+                        if cor_escolhida is None:  # se o usuário cancelar
+                            cor_escolhida = "#E11919"
+
+
+                        wire = Wireframe(pontos, cor = cor_escolhida)
                         nome_final = nome_obj or f"Wire{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, wire))
                         self.display_file.append((nome_final, wire))
