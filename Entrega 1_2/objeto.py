@@ -20,7 +20,7 @@ class ObjetoGrafico(ABC):
         for (x, y) in self.pontos:
             # ponto como vetor linha
             ponto_h = np.array([x, y, 1])
-        # multiplica ponto linha @ matriz
+            # multiplica ponto linha @ matriz
             ponto_trans = ponto_h @ Matriz
             novos_pontos.append((ponto_trans[0], ponto_trans[1]))
         
@@ -72,14 +72,14 @@ class ObjetoGrafico(ABC):
         ])
 
         # translação para origem
-        T1 = np.array([[1, 0, 0],
-        [0, 1, 0],
-        [-cx, -cy, 1]], dtype=float)
+        T1 = np.array([ [1, 0, 0],
+                        [0, 1, 0],
+                        [-cx, -cy, 1]], dtype=float)
 
         # translação de volta
-        T2 = np.array([[1, 0, 0],
-            [0, 1, 0],
-            [cx, cy, 1]], dtype=float)
+        T2 = np.array([ [1, 0, 0],
+                        [0, 1, 0],
+                        [cx, cy, 1]], dtype=float)
 
         # matriz resultante: T2 * R * T1
         M = T1 @ R @ T2
