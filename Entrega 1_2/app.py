@@ -273,8 +273,64 @@ class App:
             pass
         elif acao_escolhida == "Rotacionar":
 
-            pass
-     
+            popup = Toplevel(self.root)
+            popup.title("Escolha uma opção de rotação")
+            popup.geometry("300x250")
+
+            escolha_var = StringVar(value="op1")
+
+            # Radiobuttons
+            Label(popup, text="Escolha uma opção:").pack(pady=5)
+            Radiobutton(popup, text="Em torno do centro do mundo", variable=escolha_var, value="op1").pack(anchor="w")
+            Radiobutton(popup, text="Em torno do centro do objeto", variable=escolha_var, value="op2").pack(anchor="w")
+            Radiobutton(popup, text="Em torno de um ponto qualquer", variable=escolha_var, value="op3").pack(anchor="w")
+
+            # Caixas de texto
+            Label(popup, text="Digite o ângulo:").pack(pady=5)
+            angulo_rotacao = Entry(popup, width=25)
+            angulo_rotacao.pack()
+
+            Label(popup, text="Digite o ponto, se necesário:").pack(pady=5)
+            ponto_rotacao = Entry(popup,width = 25)
+            ponto_rotacao.pack()
+
+            def confirmar():
+                angulo = angulo_rotacao.get().strip()
+                ponto = ponto_rotacao.get().strip()
+                acao = escolha_var.get()
+
+                # valida angulo
+                try:
+                    ang = int(angulo)
+                    if not (0 <= ang <= 360):
+                        messagebox.showerror("Erro", "O ângulo deve ser um número inteiro entre 0 e 360.")
+                        popup.lift()
+                        popup.focus_force()
+                        return
+                except ValueError:
+                    messagebox.showerror("Erro", "O ângulo deve ser um número inteiro entre 0 e 360.")
+                    popup.lift()
+                    popup.focus_force()
+                    return
+
+                try:
+                    if acao == "op3" and ponto != None:# and ponto.strip():
+                        dx, dy = map(int, ponto.strip("()").split(","))
+
+                    else:
+                        return
+
+                except Exception:
+                    messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x1,y1)")
+                    popup.lift()
+                    popup.focus_force()    
+
+                # se passou, chama rotacionar
+                objeto.rotacionar(acao, ang, ponto)
+                self.redesenhar()
+                popup.destroy()
+
+            Button(popup, text="Confirmar", command=confirmar).pack(pady=15)
 
     def redesenhar(self):
         self.canvas.delete("all")
