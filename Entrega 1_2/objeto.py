@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
+import math
 
 class ObjetoGrafico(ABC):
     def __init__(self, pontos):
@@ -8,39 +9,74 @@ class ObjetoGrafico(ABC):
     @abstractmethod
     def desenhar(self, canvas, window, viewport):
         pass
-
     
-    # def transladar(self, dx, dy):
-    #     for i, (x, y) in enumerate(self.pontos):
-    #         self.pontos[i] = (x + dx, y + dy) 
-     
+    def centro(self):
+        xs = [p[0] for p in self.pontos]
+        ys = [p[1] for p in self.pontos]
+        return sum(xs)/len(xs), sum(ys)/len(ys)
+         
     def transladar(self, dx, dy):
-    # matriz de translação homogênea
         T = np.array([
             [1, 0, dx],
             [0, 1, dy],
             [0, 0, 1]
         ])
         self.multiplicacao_matrizes(T)
+        
     
     def multiplicacao_matrizes(self, Matriz):
         novos_pontos = []
         for (x, y) in self.pontos:
-            # coordenada homogênea
             ponto_h = np.array([x, y, 1])
-            # aplica a matriz
             ponto_trans = Matriz @ ponto_h
-            # salva de volta no formato (x, y)
             novos_pontos.append((ponto_trans[0], ponto_trans[1]))
         
         self.pontos = novos_pontos
 
-    def escalonar(self, canvas):
-        pass
+    def escalonar(self, sx, sy):
+        if not self.pontos:
+            return
 
-    def rotacionar(self, canvas):
-        """Rotações:
-            Em torno do centro do mundo
-            Em torno do centro do objeto
-            Em torno de um ponto qualquer (arbitrário)"""
-        pass
+        if sy is None:
+            sy = sx
+
+        cx, cy = self.centro()
+
+        T2 = np.array([[1, 0, -cx],
+                    [0, 1, -cy],
+                    [0, 0, 1]], dtype=float)
+        T1 = np.array([[1, 0, cx],
+                   [0, 1, cy],
+                   [0, 0, 1]], dtype=float)
+
+        S  = np.array([[sx, 0,  0],
+                       [0,  sy, 0],
+                       [0,  0,  1]], dtype=float)
+        
+
+        M = T1 @ S @ T2
+        self.multiplicacao_matrizes(M)
+
+    def rotacionar(self, angulo, cx=0, cy=0):
+        rad = math.radians(angulo)
+
+        R = np.array([
+            [math.cos(rad), -math.sin(rad), 0],
+            [math.sin(rad),  math.cos(rad), 0],
+            [0, 0, 1]
+        ])
+
+        # translação para origem
+        T2 = np.array([[1, 0, -cx],
+                   [0, 1, -cy],
+                   [0, 0, 1]], dtype=float)
+
+        # translação de volta
+        T1 = np.array([[1, 0, cx],
+                   [0, 1, cy],
+                   [0, 0, 1]], dtype=float)
+
+        # matriz resultante: T2 * R * T1
+        M = T1 @ R @ T2
+
+        self.multiplicacao_matrizes(M)

@@ -269,8 +269,31 @@ class App:
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1)",parent=self.root )
             
         elif acao_escolhida == "Escalonar":
-
-            pass
+            while True:
+                        entrada = simpledialog.askstring(
+                            nome, 
+                            "Digite os fatores de escala no formato: (sx,sy)", 
+                            parent=self.root
+                        )
+                        if entrada is None:  # usuário cancelou
+                            return
+                        if entrada.strip():
+                            try:
+                                sx, sy = map(float, entrada.strip("()").split(","))
+                                objeto.escalonar(sx, sy)
+                                self.redesenhar()
+                                break
+                            except Exception:
+                                messagebox.showerror(
+                                    "Erro", 
+                                    "Entrada inválida!\nDigite no formato: (sx,sy)"
+                                )
+                        else:
+                            messagebox.showerror(
+                                "Erro", 
+                                "Você precisa digitar no formato (sx,sy)", 
+                                parent=self.root
+                            )
         elif acao_escolhida == "Rotacionar":
 
             popup = Toplevel(self.root)
@@ -313,20 +336,24 @@ class App:
                     popup.focus_force()
                     return
 
-                try:
-                    if acao == "op3" and ponto != None:# and ponto.strip():
-                        dx, dy = map(int, ponto.strip("()").split(","))
+                cx, cy = 0, 0  # padrão: origem
 
-                    else:
+                if acao == "op2":
+                    # Rotação em torno do centro do objeto
+                    cx, cy = objeto.centro()
+
+                elif acao == "op3":
+                    # Rotação em torno de ponto qualquer
+                    try:
+                        cx, cy = map(int, ponto.strip("() ").split(","))
+                    except Exception:
+                        messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x,y)")
+                        popup.lift()
+                        popup.focus_force()
                         return
 
-                except Exception:
-                    messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x1,y1)")
-                    popup.lift()
-                    popup.focus_force()    
-
-                # se passou, chama rotacionar
-                objeto.rotacionar(acao, ang, ponto)
+                # chama a rotação correta
+                objeto.rotacionar(ang, cx, cy)
                 self.redesenhar()
                 popup.destroy()
 
