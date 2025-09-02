@@ -98,6 +98,21 @@ class App:
         btn_zoom = Button(zoom_frame, text="Aplicar Zoom", command=self.aplicar_zoom)
         btn_zoom.grid(row=0, column=2, padx=50)
 
+        # --- window rotation ---
+
+        rotation_frame = Frame(menu_frame, bg="#808080", pady=5)
+        rotation_frame.pack(pady=5, padx=15)
+        Label(rotation_frame, text="Rodar Window: ", bg="#808080", fg="white",
+              font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5)
+        btn_seta_esq = Button(rotation_frame, text="↶",font=("Segoe UI Symbol", 12, "bold"), width=4, height=2,
+                           command=lambda: self.rotacionar_window("botao_esquerda"))
+        btn_seta_esq.grid(row=0, column=1, padx=2, pady=2)
+
+        btn_seta_dir = Button(rotation_frame, text="↷",font=("Segoe UI Symbol", 12, "bold"), width=4, height=2,
+                           command=lambda: self.rotacionar_window("botao_direita"))
+        btn_seta_dir.grid(row=0, column=2, padx=2, pady=2)
+
+
     def limpar_tela(self):
         self.canvas.delete("all")
         self.display_file.clear()
@@ -129,6 +144,16 @@ class App:
         except ValueError:
             messagebox.showerror( "Erro", "Digite um número inteiro válido, entre 0 e 100.",
                 parent=self.root)
+            
+    def rotacionar_window(self, direcao_botao):
+
+        # Deve rotacionar para direita
+        if direcao_botao == "botao_esquerda":
+            # Rodar em angulo fixo
+            pass
+        # Deve rotacionar para esquerda
+        else:
+            pass
 
     def executar_objeto(self, tipo):
         if tipo == "Ponto":            
