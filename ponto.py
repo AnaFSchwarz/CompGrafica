@@ -9,8 +9,8 @@ class Ponto(ObjetoGrafico):
         """
         super().__init__(pontos, cor)
 
-    def desenhar(self, canvas, window, viewport):
+    def desenhar(self, canvas, window, scn, viewport):
         xw, yw = self.pontos[0]
-        xv, yv = viewport.world_to_viewport(xw, yw, window)
+        xv, yv = scn.world_to_scn_to_viewport(xw, yw, window, viewport)
         raio = 2
         canvas.create_oval(xv-raio, yv-raio, xv+raio, yv+raio, fill=self.cor, outline=self.cor)

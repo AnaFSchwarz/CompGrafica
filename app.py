@@ -307,7 +307,7 @@ class App:
                 if entrada.strip():
                     try:
                         dx, dy = map(int, entrada.strip("()").split(","))
-                        objeto.transladar(dx, dy)
+                        objeto.transladar(dx/100, dy/100)
                         self.redesenhar()
                         break
                     except Exception:
@@ -401,7 +401,7 @@ class App:
                         return
 
                 # chama a rotação correta
-                objeto.rotacionar(ang, cx, cy)
+                objeto.rotacionar(ang, cx/100, cy/100)
                 self.redesenhar()
                 popup.destroy()
 
@@ -411,7 +411,7 @@ class App:
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
-            obj.desenhar(self.canvas, self.window, self.viewport)
+            obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
 
     def desenhar_eixos(self):
 

@@ -4,11 +4,11 @@ import math
 
 class ObjetoGrafico(ABC):
     def __init__(self, pontos, cor):
-        self.pontos = pontos  # lista de pontos no mundo
+        self.pontos = [(x/100, y/100) for (x, y) in pontos]
         self.cor = cor
 
     @abstractmethod
-    def desenhar(self, canvas, window, viewport):
+    def desenhar(self, canvas, window, scn, viewport):
         pass
     
     def centro(self):
