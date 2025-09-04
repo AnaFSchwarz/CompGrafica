@@ -7,6 +7,7 @@ from reta import Reta
 from wireframe import Wireframe
 from tkinter import simpledialog, messagebox
 from tkinter.colorchooser import askcolor
+import math
 
 class App:
     def __init__(self):
@@ -113,6 +114,16 @@ class App:
         btn_seta_dir = Button(rotation_frame, text="↷",font=("Segoe UI Symbol", 12, "bold"), width=4, height=2,
                            command=lambda: self.rotacionar_window("botao_direita"))
         btn_seta_dir.grid(row=0, column=2, padx=2, pady=2)
+        Label(rotation_frame, text="Ângulo atual: ", bg="#808080", fg="white",
+              font=("Arial", 10, "bold")).grid(row=1, column=0, padx=5)
+                # StringVar para mostrar o ângulo da window
+        self.angulo_var = StringVar()
+        self.angulo_var.set(f"{self.window.angulo:.1f}°")  # inicializa com valor atual
+
+        # Label que mostra o valor do ângulo
+        Label(rotation_frame, textvariable=self.angulo_var, bg="#808080", fg="white",
+            font=("Arial", 10, "bold")).grid(row=1, column=1, columnspan=2, padx=5)
+
 
 
     def limpar_tela(self):
@@ -151,11 +162,16 @@ class App:
 
         # Deve rotacionar para direita
         if direcao_botao == "botao_esquerda":
-            # Rodar em angulo fixo
-            pass
+            self.window.angulo += 30
+            
         # Deve rotacionar para esquerda
         else:
-            pass
+            self.window.angulo -= 30
+        # atualiza label
+        self.angulo_var.set(f"{self.window.angulo:.1f}°")
+
+        self.redesenhar()
+            
 
     def executar_objeto(self, tipo):
         if tipo == "Ponto":            
@@ -415,17 +431,35 @@ class App:
         for nome, obj in self.display_file:
             obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
 
+    import math
+
     def desenhar_eixos(self):
+        ang = math.radians(self.window.angulo)
 
+        # matriz de rotação
+        cos_a = math.cos(ang)
+        sin_a = math.sin(ang)
 
+        def rot(x, y):
+            xr = x * cos_a - y * sin_a
+            yr = x * sin_a + y * cos_a
+            return xr, yr
 
-        xv1, yv1 = self.scn.world_to_scn_to_viewport(0, -1, self.window, self.viewport)
-        xv2, yv2 = self.scn.world_to_scn_to_viewport(0, 1, self.window, self.viewport)
+        # eixo Y (vertical no mundo, mas rotacionado pela window)
+        x1, y1 = rot(0, -1)
+        x2, y2 = rot(0,  1)
+        xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
+        xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
-        xv1, yv1 = self.scn.world_to_scn_to_viewport(-1, 0, self.window, self.viewport)
-        xv2, yv2 = self.scn.world_to_scn_to_viewport(1, 0, self.window, self.viewport)
+        # eixo X (horizontal no mundo, mas rotacionado pela window)
+        x1, y1 = rot(-1, 0)
+        x2, y2 = rot( 1, 0)
+        xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
+        xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
+
+
 
     def run(self):
         self.root.mainloop()

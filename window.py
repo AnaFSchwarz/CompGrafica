@@ -7,6 +7,7 @@ class Window():
         self.xmax = xmax
         self.ymin = ymin
         self.ymax = ymax
+        self.angulo = 0
 
     def mover(self, dx, dy):
         self.xmin += dx
@@ -36,5 +37,7 @@ class Window():
         half = tam_f / 2
         self.xmin, self.xmax = cx - half, cx + half
         self.ymin, self.ymax = cy - half, cy + half
+
+
 
 
