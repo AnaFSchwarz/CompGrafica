@@ -326,6 +326,7 @@ class App:
                     try:
                         dx, dy = map(int, entrada.strip("()").split(","))
                         objeto.transladar(dx/100, dy/100)
+
                         self.redesenhar()
                         break
                     except Exception:
@@ -432,8 +433,6 @@ class App:
         self.desenhar_eixos()
         for nome, obj in self.display_file:
             obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
-
-    import math
 
     def desenhar_eixos(self):
         ang = math.radians(self.window.angulo)
