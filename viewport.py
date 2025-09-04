@@ -6,8 +6,11 @@ class Viewport:
         self.yv_min = yv_min
         self.yv_max = yv_max
 
-    def world_to_viewport(self, xw, yw, window):
-        """Transforma coordenadas do mundo (window) em pixels (viewport)"""
-        xv = self.xv_min + (xw - window.xmin) * (self.xv_max - self.xv_min) / (window.xmax - window.xmin)
-        yv = self.yv_max - (yw - window.ymin) * (self.yv_max - self.yv_min) / (window.ymax - window.ymin)
+    def scn_to_viewport(self, xn, yn):
+        """
+        Transforma coordenadas no SCN (0 a 1) para coordenadas em pixels (viewport).
+        Atenção: o eixo Y da tela cresce para baixo, então invertendo yn.
+        """
+        xv = self.xv_min + xn * (self.xv_max - self.xv_min)
+        yv = self.yv_max - yn * (self.yv_max - self.yv_min)
         return xv, yv

@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 
 class Window():
-    def __init__(self, xmin=-350, xmax=350, ymin=-350, ymax= 350):
+    def __init__(self, xmin=-1, xmax=1, ymin=-1, ymax= 1):
         self.xmin = xmin
         self.xmax = xmax
         self.ymin = ymin

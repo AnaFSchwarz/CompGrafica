@@ -1,6 +1,7 @@
 from tkinter import *
 from window import Window
 from viewport import Viewport
+from scn import SCN
 from ponto import Ponto
 from reta import Reta
 from wireframe import Wireframe
@@ -21,6 +22,7 @@ class App:
 
         # Window e Viewport
         self.window = Window()
+        self.scn = SCN()
         self.viewport = Viewport(0, self.canvas_width, 0, self.canvas_height)
 
         # Display file
@@ -412,12 +414,15 @@ class App:
             obj.desenhar(self.canvas, self.window, self.viewport)
 
     def desenhar_eixos(self):
-        xv1, yv1 = self.viewport.world_to_viewport(0, -350, self.window)
-        xv2, yv2 = self.viewport.world_to_viewport(0, 350, self.window)
+
+
+
+        xv1, yv1 = self.scn.world_to_scn_to_viewport(0, -1, self.window, self.viewport)
+        xv2, yv2 = self.scn.world_to_scn_to_viewport(0, 1, self.window, self.viewport)
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
-        xv1, yv1 = self.viewport.world_to_viewport(-350, 0, self.window)
-        xv2, yv2 = self.viewport.world_to_viewport(350, 0, self.window)
+        xv1, yv1 = self.scn.world_to_scn_to_viewport(-1, 0, self.window, self.viewport)
+        xv2, yv2 = self.scn.world_to_scn_to_viewport(1, 0, self.window, self.viewport)
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
     def run(self):
