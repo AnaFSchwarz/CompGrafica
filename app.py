@@ -394,6 +394,8 @@ class App:
                     # Rotação em torno de ponto qualquer
                     try:
                         cx, cy = map(int, ponto.strip("() ").split(","))
+                        cx /= 100
+                        cy /= 100
                     except Exception:
                         messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x,y)")
                         popup.lift()
@@ -401,7 +403,7 @@ class App:
                         return
 
                 # chama a rotação correta
-                objeto.rotacionar(ang, cx/100, cy/100)
+                objeto.rotacionar(ang, cx, cy)
                 self.redesenhar()
                 popup.destroy()
 
