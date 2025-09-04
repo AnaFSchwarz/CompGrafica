@@ -3,9 +3,10 @@ import numpy as np
 import math
 
 class ObjetoGrafico(ABC):
-    def __init__(self, pontos, cor):
+    def __init__(self, pontos, cor, window):
         self.pontos = [(x/100, y/100) for (x, y) in pontos]
         self.cor = cor
+        self.window = window
 
     @abstractmethod
     def desenhar(self, canvas, window, scn, viewport):
@@ -86,3 +87,14 @@ class ObjetoGrafico(ABC):
         M = T1 @ R @ T2
 
         self.multiplicacao_matrizes(M)
+
+
+    def rotacao_window(self,x, y):
+
+        tetha = math.radians(self.window.angulo)
+        cos_a = math.cos(tetha)
+        sin_a = math.sin(tetha)
+
+        xr = x * cos_a - y * sin_a
+        yr = x * sin_a + y * cos_a
+        return xr, yr

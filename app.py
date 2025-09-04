@@ -164,9 +164,11 @@ class App:
         if direcao_botao == "botao_esquerda":
             self.window.angulo += 30
             
+            
         # Deve rotacionar para esquerda
         else:
             self.window.angulo -= 30
+            
         # atualiza label
         self.angulo_var.set(f"{self.window.angulo:.1f}°")
 
@@ -192,7 +194,7 @@ class App:
                         cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
                         if cor_escolhida is None:  # se o usuário cancelar
                             cor_escolhida = "#E11919"
-                        ponto = Ponto([(x, y)], cor = cor_escolhida)
+                        ponto = Ponto([(x, y)], cor_escolhida, self.window)
                         nome_final = nome_obj or f"Ponto{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, ponto))
                         self.display_file.append((nome_final, ponto))
@@ -224,7 +226,7 @@ class App:
                             cor_escolhida = "#E11919"
 
                         if len(pontos) == 2:
-                            reta = Reta(pontos, cor = cor_escolhida)
+                            reta = Reta(pontos, cor_escolhida, self.window)
                             nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
                             self.lista_obj.append((nome_final, reta))                        
                             self.display_file.append((nome_final, reta))
@@ -254,7 +256,7 @@ class App:
                             cor_escolhida = "#E11919"
 
 
-                        wire = Wireframe(pontos, cor = cor_escolhida)
+                        wire = Wireframe(pontos, cor_escolhida, self.window)
                         nome_final = nome_obj or f"Wire{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, wire))
                         self.display_file.append((nome_final, wire))
