@@ -5,9 +5,12 @@ from scn import SCN
 from ponto import Ponto
 from reta import Reta
 from wireframe import Wireframe
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox,filedialog
 from tkinter.colorchooser import askcolor
 import math
+from descritor_obj import DescritorOBJ
+from tkinter.filedialog import asksaveasfilename, askopenfilename
+
 
 class App:
     def __init__(self):
@@ -20,6 +23,7 @@ class App:
         self.canvas_height = 700
         self.canvas = Canvas(self.root, width=self.canvas_width, height=self.canvas_height, bg="white")
         self.canvas.pack(side="right", fill="both", expand=False)
+        self.descritor = DescritorOBJ()
 
         # Window e Viewport
         self.window = Window()
@@ -36,93 +40,93 @@ class App:
         self.run()
 
     def _criar_menu(self):
-        menu_frame = Frame(self.root, bg="#A29D9D", width=200)
+        menu_frame = Frame(self.root, bg="#F0F4F8", width=250)
         menu_frame.pack(side="left", fill="y")
 
         self.desenhar_eixos()
 
         # --- Criar objeto ---
-        Label(menu_frame, text="Criar Objeto:", width=20, bg="#808080", fg="white",
-              font=("Arial", 10, "bold")).pack(pady=(20, 5))
-
-        criar_frame = Frame(menu_frame, bg="#808080")
-        criar_frame.pack(pady=5)
+        Label(menu_frame, text="Criar Objeto:", width=25, bg="#255A75", fg="white",
+            font=("Arial", 10, "bold")).pack(pady=(10,2))
+        
+        criar_frame = Frame(menu_frame, bg="#F0F4F8")
+        criar_frame.pack(pady=2, padx=20, fill='x')
 
         Button(criar_frame, text="Ponto", width=10, command=lambda: self.executar_objeto("Ponto")).grid(row=0, column=0, padx=2, pady=2)
         Button(criar_frame, text="Reta", width=10, command=lambda: self.executar_objeto("Reta")).grid(row=0, column=1, padx=2, pady=2)
         Button(criar_frame, text="Wireframe", width=10, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
 
-        # --- Lista de objetos criados ---
-        Label(menu_frame, text="Objetos criados:", width=20, bg="#808080", fg="white",
-              font=("Arial", 10, "bold")).pack(pady=(20, 5))
+        # --- Lista de objetos com Scrollbar ---
+        Label(menu_frame, text="Objetos criados:", width=25, bg="#255A75", fg="white",
+            font=("Arial", 10, "bold")).pack(pady=(10,2))
 
-        self.lista_objetos = Listbox(menu_frame, height=8, width=40, exportselection=False)
-        self.lista_objetos.pack(padx=5)
+        list_frame = Frame(menu_frame)
+        list_frame.pack(pady=2, padx=5, fill='x')
+
+        self.lista_objetos = Listbox(list_frame, height=8, width=30, exportselection=False)
+        self.lista_objetos.pack(side='left', fill='both', expand=True)
         self.lista_objetos.bind("<<ListboxSelect>>", self.selecao_objeto)
-         # Bind: clique direito
         self.lista_objetos.bind("<Button-3>", self.selecao_menu_objeto)
 
-        # --- Botão limpar tela ---
-        Button(menu_frame, text="Limpar Tela", width=20, height=2, command=self.limpar_tela).pack(pady=10)
+        scrollbar = Scrollbar(list_frame)
+        scrollbar.pack(side='right', fill='y')
+        self.lista_objetos.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.lista_objetos.yview)
 
-        # --- frame botões de movimento ---
-        movimento_frame = Frame(menu_frame, bg="#808080")
-        movimento_frame.pack(pady=5)
+        # --- Limpar Tela (perto da lista) ---
+        Button(menu_frame, text="Limpar Tela", width=20, command=self.limpar_tela).pack(pady=5)
 
-        btn_cima = Button(movimento_frame, text="CIMA", width=10, height=2,
-                          command=lambda: self.mover_window(0, self.window.get_tam() / 8))
-        btn_cima.grid(row=0, column=1, padx=5, pady=5)
+        # --- Movimento (maior e centralizado) ---
+        Label(menu_frame, text="Movimento:", width=25, bg="#255A75", fg="white",
+            font=("Arial", 10, "bold")).pack(pady=(10,2))
 
-        btn_esquerda = Button(movimento_frame, text="ESQUERDA", width=10, height=2,
-                              command=lambda: self.mover_window(-self.window.get_tam() / 8, 0))
-        btn_esquerda.grid(row=1, column=0, padx=(1), pady=5)
+        movimento_frame = Frame(menu_frame, bg="#F0F4F8")
+        movimento_frame.pack(pady=2, padx=5)
 
-        btn_centralizar = Button(movimento_frame, text="CENTRALIZAR", width=10, height=2,
-                                 command=lambda: self.centralizar_window())
-        btn_centralizar.grid(row=1, column=1, padx=(1), pady=5)
+        # Mantendo padrão maior e centralizado
+        Button(movimento_frame, text="CIMA", width=12, height=2,
+            command=lambda: self.mover_window(0, self.window.get_tam()/8)).grid(row=0, column=1, padx=2, pady=2)
+        Button(movimento_frame, text="ESQUERDA", width=12, height=2,
+            command=lambda: self.mover_window(-self.window.get_tam()/8,0)).grid(row=1, column=0, padx=2, pady=2)
+        Button(movimento_frame, text="CENTRALIZAR", width=12, height=2,
+            command=self.centralizar_window).grid(row=1, column=1, padx=2, pady=2)
+        Button(movimento_frame, text="DIREITA", width=12, height=2,
+            command=lambda: self.mover_window(self.window.get_tam()/8,0)).grid(row=1, column=2, padx=2, pady=2)
+        Button(movimento_frame, text="BAIXO", width=12, height=2,
+            command=lambda: self.mover_window(0,-self.window.get_tam()/8)).grid(row=2, column=1, padx=2, pady=2)
 
-        btn_direita = Button(movimento_frame, text="DIREITA", width=10, height=2,
-                             command=lambda: self.mover_window(self.window.get_tam() / 8, 0))
-        btn_direita.grid(row=1, column=2, padx=(1), pady=5)
+        # --- Zoom ---
+        Label(menu_frame, text="Zoom (%):", width=25, bg="#255A75", fg="white",
+            font=("Arial", 10, "bold")).pack(pady=(10,2))
 
-        btn_baixo = Button(movimento_frame, text="BAIXO", width=10, height=2,
-                           command=lambda: self.mover_window(0, -self.window.get_tam() / 8))
-        btn_baixo.grid(row=2, column=1, padx=5, pady=5)
+        zoom_frame = Frame(menu_frame, bg="#F0F4F8")
+        zoom_frame.pack(pady=2, padx=5, fill='x')
 
-        # --- frame zoom ---
-        zoom_frame = Frame(menu_frame, bg="#808080", pady=5)
-        zoom_frame.pack(pady=5, padx=15)
+        self.zoom_entry = Entry(zoom_frame, width=15)
+        self.zoom_entry.insert(0,"0")
+        self.zoom_entry.pack(side='left', padx=5)
+        Button(zoom_frame, text="Aplicar Zoom", width=15, command=self.aplicar_zoom).pack(side='left', padx=2)
 
-        Label(zoom_frame, text="Zoom(%): ", bg="#808080", fg="white",
-              font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5)
-        self.zoom_entry = Entry(zoom_frame, width=5)
-        self.zoom_entry.insert(0, "0")
-        self.zoom_entry.grid(row=0, column=1, padx=0)
-        btn_zoom = Button(zoom_frame, text="Aplicar Zoom", command=self.aplicar_zoom)
-        btn_zoom.grid(row=0, column=2, padx=50)
+        # --- Rotação Window ---
+        Label(menu_frame, text="Rotação Window:", width=25, bg="#255A75", fg="white",
+            font=("Arial", 10, "bold")).pack(pady=(10,2))
 
-        # --- window rotation ---
+        rotation_frame = Frame(menu_frame, bg="#F0F4F8")
+        rotation_frame.pack(pady=2, padx=5)
 
-        rotation_frame = Frame(menu_frame, bg="#808080", pady=5)
-        rotation_frame.pack(pady=5, padx=15)
-        Label(rotation_frame, text="Rodar Window: ", bg="#808080", fg="white",
-              font=("Arial", 10, "bold")).grid(row=0, column=0, padx=5)
-        btn_seta_esq = Button(rotation_frame, text="↶",font=("Segoe UI Symbol", 12, "bold"), width=4, height=2,
-                           command=lambda: self.rotacionar_window("botao_esquerda"))
-        btn_seta_esq.grid(row=0, column=1, padx=2, pady=2)
+        Button(rotation_frame, text="↶", width=6, height=2,
+            command=lambda: self.rotacionar_window("botao_esquerda")).grid(row=0, column=0, padx=2, pady=2)
+        Button(rotation_frame, text="↷", width=6, height=2,
+            command=lambda: self.rotacionar_window("botao_direita")).grid(row=0, column=1, padx=2, pady=2)
+        self.angulo_var = StringVar(value=f"{self.window.angulo:.1f}°")
+        Label(rotation_frame, textvariable=self.angulo_var, bg="#F0F4F8").grid(row=1, column=0, columnspan=2, pady=2)
 
-        btn_seta_dir = Button(rotation_frame, text="↷",font=("Segoe UI Symbol", 12, "bold"), width=4, height=2,
-                           command=lambda: self.rotacionar_window("botao_direita"))
-        btn_seta_dir.grid(row=0, column=2, padx=2, pady=2)
-        Label(rotation_frame, text="Ângulo atual: ", bg="#808080", fg="white",
-              font=("Arial", 10, "bold")).grid(row=1, column=0, padx=5)
-                # StringVar para mostrar o ângulo da window
-        self.angulo_var = StringVar()
-        self.angulo_var.set(f"{self.window.angulo:.1f}°")  # inicializa com valor atual
+        # --- Exportar e Importar (mesma linha) ---
+        final_frame = Frame(menu_frame, bg="#F0F4F8")
+        final_frame.pack(side='bottom', pady=10, padx=5, fill='x')
 
-        # Label que mostra o valor do ângulo
-        Label(rotation_frame, textvariable=self.angulo_var, bg="#808080", fg="white",
-            font=("Arial", 10, "bold")).grid(row=1, column=1, columnspan=2, padx=5)
+        Button(final_frame, text="Exportar", width=12, command=self.exportar_obj).pack(side='left', padx=2)
+        Button(final_frame, text="Importar", width=12, command=self.importar_obj).pack(side='left', padx=2)
 
 
 
@@ -460,6 +464,34 @@ class App:
         xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
+    def exportar_obj(self):
+        if not self.display_file:
+            messagebox.showinfo("Info", "Não há objetos para exportar.")
+            return
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".obj", filetypes=[("Wavefront OBJ", "*.obj")])
+        if not filename:
+            return
+        try:
+            self.descritor.exportar(self.display_file, filename)
+            messagebox.showinfo("Exportar", f"Arquivo exportado com sucesso:\n{filename}")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
+
+    def importar_obj(self):
+        filename = filedialog.askopenfilename(filetypes=[("Wavefront OBJ", "*.obj")])
+        if not filename:
+            return
+        try:
+            objs_importados = self.descritor.importar(filename, self.window)
+            for nome, obj in objs_importados:
+                self.lista_obj.append((nome, obj))
+                self.display_file.append((nome, obj))
+                self.lista_objetos.insert(END, nome)
+            self.redesenhar()
+            messagebox.showinfo("Importar", f"{len(objs_importados)} objetos importados com sucesso.")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao importar:\n{e}")
 
 
     def run(self):
