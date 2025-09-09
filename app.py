@@ -16,10 +16,10 @@ class App:
     def __init__(self):
         self.root = Tk()
         self.root.title("Sistema Gráfico Interativo 2D")
-        self.root.geometry("1000x700")
+        self.root.geometry("1050x750")
 
         # Canvas
-        self.canvas_width = 700
+        self.canvas_width = 750
         self.canvas_height = 700
         self.canvas = Canvas(self.root, width=self.canvas_width, height=self.canvas_height, bg="white")
         self.canvas.pack(side="right", fill="both", expand=False)
@@ -463,6 +463,13 @@ class App:
         xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
         xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
+
+        # caixa de window
+        x1, y1 = rot(-1, -1)
+        x2, y2 = rot( 1, 1)
+        xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
+        xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
+        self.canvas.create_rectangle(xv1, yv1, xv2, yv2, fill = None, outline="red", width=3)
 
     def exportar_obj(self):
         if not self.display_file:
