@@ -11,6 +11,10 @@ class ObjetoGrafico(ABC):
     @abstractmethod
     def desenhar(self, canvas, window, scn, viewport):
         pass
+
+    @abstractmethod
+    def clipping(self, pontos, window):
+        pass
     
     def centro(self):
         xs = [p[0] for p in self.pontos]
