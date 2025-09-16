@@ -11,21 +11,14 @@ TOP    = 8
 class Reta(ObjetoGrafico):
 
     def desenhar(self, canvas, window, scn, viewport):
-        print("1) DEBUG pontos originais da reta", self.pontos)
-        tipo = 2
-        aceito, (xc1, yc1, xc2, yc2) = self.clipping(self.pontos[0][0], self.pontos[0][1], self.pontos[1][0], self.pontos[1][1], window, tipo)
-        print("2) DEBUG pontos cutting", aceito, xc1, yc1, xc2, yc2)
+        aceito, (xc1, yc1, xc2, yc2) = self.clipping(self.pontos[0][0], self.pontos[0][1], self.pontos[1][0], self.pontos[1][1], window, self.tipo_clipping)
         (x1, y1) = self.rotacao_window(xc1, yc1)
         (x2, y2) = self.rotacao_window(xc2, yc2)
-        print("3) DEBUG reta pontos rotacao ", x1,y1,x2,y2)
-      
+
         # Se há parte visível dentro da window
         if aceito:
-            print("4 DEBUG ACEITO pontos originais da reta", self.pontos)
-            print("5 DEBUG ACEITO pontos cutting", xc1, yc1, xc2, yc2)
             xv1, yv1 = scn.world_to_scn_to_viewport(x1, y1, window, viewport)
             xv2, yv2 = scn.world_to_scn_to_viewport(x2, y2, window, viewport)
-            print("6 DEBUG ACEITO pontos scn", xv1, yv1, xv2, yv2)
             canvas.create_line(xv1, yv1, xv2, yv2, fill=self.cor, width=2)
 
     def _compute_outcode(self, x, y, window):

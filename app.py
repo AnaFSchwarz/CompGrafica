@@ -121,6 +121,22 @@ class App:
         self.angulo_var = StringVar(value=f"{self.window.angulo:.1f}°")
         Label(rotation_frame, textvariable=self.angulo_var, bg="#F0F4F8").grid(row=1, column=0, columnspan=2, pady=2)
 
+        # --- Escolha do algoritmo de clipping --- 
+        Label(menu_frame, text="Algoritmo de clipping retas", width=25, bg="#255A75", fg="white",
+            font=("Arial", 10, "bold")).pack(pady=(10,2))
+        self.tipo_clipping = IntVar(value=1)
+        clipping_frame = Frame(menu_frame, bg="white")
+        clipping_frame.pack(pady=(2,10), anchor="w")  # fica colado ao título e alinhado à esquerda
+
+        Radiobutton(clipping_frame, text="Cohen-Sutherland",
+                    variable=self.tipo_clipping, value=1,
+                    bg="white").pack(side="left", padx=5)
+
+        Radiobutton(clipping_frame, text="Liang–Barsky",
+                    variable=self.tipo_clipping, value=2,
+                    bg="white").pack(side="left", padx=5)
+    
+
         # --- Exportar e Importar (mesma linha) ---
         final_frame = Frame(menu_frame, bg="#F0F4F8")
         final_frame.pack(side='bottom', pady=10, padx=5, fill='x')
@@ -230,7 +246,7 @@ class App:
                             cor_escolhida = "#E11919"
 
                         if len(pontos) == 2:
-                            reta = Reta(pontos, cor_escolhida, self.window)
+                            reta = Reta(pontos, cor_escolhida, self.window, self.tipo_clipping)
                             nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
                             self.lista_obj.append((nome_final, reta))                        
                             self.display_file.append((nome_final, reta))

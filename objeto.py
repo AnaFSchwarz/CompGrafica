@@ -3,9 +3,10 @@ import numpy as np
 import math
 
 class ObjetoGrafico(ABC):
-    def __init__(self, pontos, cor, window):
+    def __init__(self, pontos, cor, window, tipo_clipping = 1):
         self.pontos = [(x/100, y/100) for (x, y) in pontos]
         self.cor = cor
+        self.tipo_clipping = tipo_clipping
         self.window = window
 
     @abstractmethod
@@ -13,7 +14,7 @@ class ObjetoGrafico(ABC):
         pass
 
     @abstractmethod
-    def clipping(self, pontos, window, tipo = 0):
+    def clipping(self, pontos, window, tipo_clipping = 1):
         pass
     
     def centro(self):
