@@ -13,7 +13,7 @@ class ObjetoGrafico(ABC):
         pass
 
     @abstractmethod
-    def clipping(self, pontos, window):
+    def clipping(self, pontos, window, tipo = 0):
         pass
     
     def centro(self):
