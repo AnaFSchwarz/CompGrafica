@@ -230,7 +230,6 @@ class App:
                             cor_escolhida = "#E11919"
 
                         if len(pontos) == 2:
-                            print("DEBUG RETA APP ", pontos)
                             reta = Reta(pontos, cor_escolhida, self.window)
                             nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
                             self.lista_obj.append((nome_final, reta))                        
@@ -466,11 +465,15 @@ class App:
         self.canvas.create_line(xv1, yv1, xv2, yv2, fill="gray", width=2, arrow='last')
 
         # caixa de window
-        x1, y1 = rot(-1, -1)
-        x2, y2 = rot( 1, 1)
-        xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
-        xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
-        self.canvas.create_rectangle(xv1, yv1, xv2, yv2, fill = None, outline="red", width=3)
+        corners = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
+        pts = []
+        for x, y in corners:
+            xr, yr = rot(x, y)
+            xv, yv = self.scn.world_to_scn_to_viewport(xr, yr, self.window, self.viewport)
+            pts.extend([xv, yv])
+
+        self.canvas.create_polygon(pts, outline="red", fill="", width=3)
+
 
     def exportar_obj(self):
         if not self.display_file:

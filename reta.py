@@ -10,39 +10,24 @@ TOP    = 8
 class Reta(ObjetoGrafico):
 
     def desenhar(self, canvas, window, scn, viewport):
-        (x1, y1) = self.rotacao_window(*self.pontos[0])
-        (x2, y2) = self.rotacao_window(*self.pontos[1])
-
-        aceito, (xc1, yc1, xc2, yc2) = self.clipping((x1, y1, x2, y2), window)
-
+        print("1) DEBUG pontos originais da reta", self.pontos)
+        aceito, (xc1, yc1, xc2, yc2) = self.clipping(self.pontos[0][0], self.pontos[0][1], self.pontos[1][0], self.pontos[1][1], window)
+        print("2) DEBUG pontos cutting", xc1, yc1, xc2, yc2)
+        (x1, y1) = self.rotacao_window(xc1, yc1)
+        (x2, y2) = self.rotacao_window(xc2, yc2)
+        print("3) DEBUG reta pontos rotacao ", x1,y1,x2,y2)
+      
         # Se há parte visível dentro da window
         if aceito:
-            print("DEBUG pontos originais da reta", self.pontos)
-            print("DEBUG ACEITO pontos cutting", xc1, yc1, xc2, yc2)
-            xv1, yv1 = scn.world_to_scn_to_viewport(xc1, yc1, window, viewport)
-            xv2, yv2 = scn.world_to_scn_to_viewport(xc2, yc2, window, viewport)
-            print("DEBUG ACEITO pontos scn", xv1, yv1, xv2, yv2)
+            print("4 DEBUG ACEITO pontos originais da reta", self.pontos)
+            print("5 DEBUG ACEITO pontos cutting", xc1, yc1, xc2, yc2)
+            xv1, yv1 = scn.world_to_scn_to_viewport(x1, y1, window, viewport)
+            xv2, yv2 = scn.world_to_scn_to_viewport(x2, y2, window, viewport)
+            print("6 DEBUG ACEITO pontos scn", xv1, yv1, xv2, yv2)
             canvas.create_line(xv1, yv1, xv2, yv2, fill=self.cor, width=2)
 
-        # Desenha as partes fora em cinza (se existirem)
-        # Trecho 1: ponto inicial até o ponto recortado
-        if (x1, y1) != (xc1, yc1) and 0==1:
-            print("DEBUG (x1, y1) != (xc1, yc1) ", aceito)
-            xv1, yv1 = scn.world_to_scn_to_viewport(x1, y1, window, viewport)
-            xv2, yv2 = scn.world_to_scn_to_viewport(xc1, yc1, window, viewport)
-            #self.cor = "light gray"
-            canvas.create_line(xv1, yv1, xv2, yv2, fill="light gray", width=2)
-
-        # Trecho 2: ponto final até o ponto recortado
-        if (x2, y2) != (xc2, yc2) and 0==1:
-            print("DEBUG (x2, y2) != (xc2, yc2) ", aceito)
-            xv1, yv1 = scn.world_to_scn_to_viewport(x2, y2, window, viewport)
-            xv2, yv2 = scn.world_to_scn_to_viewport(xc2, yc2, window, viewport)
-            #self.cor = "light gray"
-            canvas.create_line(xv1, yv1, xv2, yv2, fill="light gray", width=2)
-
     def _compute_outcode(self, x, y, window):
-        xmin, xmax, ymin, ymax = window.xmin, window.xmax, window.ymin, window.ymax
+        xmin, xmax, ymin, ymax = window.base_xmin, window.base_xmax, window.base_ymin, window.base_ymax
         code = INSIDE
         if x < xmin: code |= LEFT
         elif x > xmax: code |= RIGHT
@@ -50,10 +35,11 @@ class Reta(ObjetoGrafico):
         elif y > ymax: code |= TOP
         return code
 
-    def clipping(self, pontos, window):
+    def clipping(self, x1, y1, x2, y2, window):
         """ Algoritmo de Cohen–Sutherland """
-        x1, y1, x2, y2 = pontos
-        xmin, xmax, ymin, ymax = window.xmin, window.xmax, window.ymin, window.ymax
+        
+        print( x1, y1, x2, y2)
+        xmin, xmax, ymin, ymax = window.base_xmin, window.base_xmax, window.base_ymin, window.base_ymax
 
         outcode1 = self._compute_outcode(x1, y1, window)
         outcode2 = self._compute_outcode(x2, y2, window)
