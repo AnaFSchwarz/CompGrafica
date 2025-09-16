@@ -14,7 +14,6 @@ class Ponto(ObjetoGrafico):
         xw, yw = self.rotacao_window(*self.pontos[0])
         xv, yv = scn.world_to_scn_to_viewport(xw, yw, window, viewport)
         raio = 2
-        print( "DEBUG ", self.pontos, xv-raio, yv-raio, xv+raio, yv+raio)
         self.clipping(self.pontos, window)
         canvas.create_oval(xv-raio, yv-raio, xv+raio, yv+raio, fill=self.cor, outline=self.cor)
 

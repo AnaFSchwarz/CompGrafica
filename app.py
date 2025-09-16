@@ -230,6 +230,7 @@ class App:
                             cor_escolhida = "#E11919"
 
                         if len(pontos) == 2:
+                            print("DEBUG RETA APP ", pontos)
                             reta = Reta(pontos, cor_escolhida, self.window)
                             nome_final = nome_obj or f"Reta{len(self.display_file) + 1}"
                             self.lista_obj.append((nome_final, reta))                        
