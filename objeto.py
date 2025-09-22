@@ -17,10 +17,6 @@ class ObjetoGrafico(ABC):
     def clipping(self, pontos, window, tipo_clipping = 1):
         pass
     
-    @abstractmethod
-    def adicionar_curva(self, pontos):
-        pass
-    
     def centro(self):
         xs = [p[0] for p in self.pontos]
         ys = [p[1] for p in self.pontos]

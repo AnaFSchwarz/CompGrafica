@@ -53,10 +53,10 @@ class App:
         criar_frame = Frame(menu_frame, bg="#F0F4F8")
         criar_frame.pack(pady=2, padx=20, fill='x')
 
-        Button(criar_frame, text="Ponto", width=10, command=lambda: self.executar_objeto("Ponto")).grid(row=0, column=0, padx=2, pady=2)
-        Button(criar_frame, text="Reta", width=10, command=lambda: self.executar_objeto("Reta")).grid(row=0, column=1, padx=2, pady=2)
-        Button(criar_frame, text="Wireframe", width=10, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
-        Button(criar_frame, text="Curva", width=10, command=lambda: self.executar_objeto("Curva")).grid(row=0, column=3, padx=2, pady=2)
+        Button(criar_frame, text="Ponto", width=6, command=lambda: self.executar_objeto("Ponto")).grid(row=0, column=0, padx=2, pady=2)
+        Button(criar_frame, text="Reta", width=6, command=lambda: self.executar_objeto("Reta")).grid(row=0, column=1, padx=2, pady=2)
+        Button(criar_frame, text="Wireframe", width=9, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
+        Button(criar_frame, text="Curva", width=6, command=lambda: self.executar_objeto("Curva")).grid(row=0, column=3, padx=2, pady=2)
 
         # --- Lista de objetos com Scrollbar ---
         Label(menu_frame, text="Objetos criados:", width=25, bg="#255A75", fg="white",
@@ -215,7 +215,7 @@ class App:
                         # Abre seletor de cor
                         cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
                         if cor_escolhida is None:  # se o usuário cancelar
-                            cor_escolhida = "#E11919"
+                            cor_escolhida = "#1C19E1"
                         ponto = Ponto([(x, y)], cor_escolhida, self.window)
                         nome_final = nome_obj or f"Ponto{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, ponto))
@@ -255,7 +255,6 @@ class App:
                             self.lista_objetos.insert(END, nome_final)
                             break
                     except Exception:
-                        #print("Entrada inválida!")
                         messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2)")
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
@@ -271,28 +270,24 @@ class App:
                 if entrada:
                     try:
                         pontos = list(eval(f"[{entrada}]"))
-
                          # Abre seletor de cor
                         cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
                         if cor_escolhida is None:  # se o usuário cancelar
-                            cor_escolhida = "#E11919"
-
-
+                            cor_escolhida = "#19E15C"
                         wire = Wireframe(pontos, cor_escolhida, self.window)
                         nome_final = nome_obj or f"Wire{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, wire))
                         self.display_file.append((nome_final, wire))
                         self.lista_objetos.insert(END, nome_final)
                         break
+
                     except Exception:
-                        #print("Entrada inválida!")
                         messagebox.showerror("Erro", "Entrada inválida!\nDigite os pontos no formato: (x1,y1),(x2,y2),...")
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2),...",parent=self.root )
 
         elif tipo == "Curva":
-            print("DEBUG CURVA")
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para a curva:", parent=self.root)
             if nome_obj is None:  
                 return  
@@ -301,27 +296,23 @@ class App:
                 if entrada is None:  # usuário cancelou na segunda caixa
                     return
                 if entrada.strip():
-                    #try:
-                    pontos = list(eval(f"[{entrada}]"))
-                    print(pontos)
-                         # Abre seletor de cor
-                    cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
-                    if cor_escolhida is None:  # se o usuário cancelar
-                        cor_escolhida = "#C3E119"
+                    try:
+                        pontos = list(eval(f"[{entrada}]"))
+                        # Abre seletor de cor
+                        cor_escolhida = askcolor(title="Escolha a cor do ponto", parent=self.root)[1]
+                        if cor_escolhida is None:  # se o usuário cancelar
+                            cor_escolhida = "#C3E119"
 
-                    if len(pontos) == 4:
-                        print ("DEBUG 1")
-                        curva = Curva(pontos, cor_escolhida, self.window)
-                        print ("DEBUG 2")
-                        nome_final = nome_obj or f"Curva{len(self.display_file) + 1}"
-                        print ("DEBUG 3")
-                        self.lista_obj.append((nome_final, curva))
-                        self.display_file.append((nome_final, curva))
-                        self.lista_objetos.insert(END, nome_final)
-                        break
-                    #except Exception:
-                        #print("Entrada inválida!")
-                     #   messagebox.showerror("Erro", "Entrada inválida!\nDigite 4 pontos no formato: (x1,y1),(x2,y2),(x3,y3),(x4,y4)")
+                        if len(pontos) == 4:
+                            curva = Curva(pontos, cor_escolhida, self.window)
+                            nome_final = nome_obj or f"Curva{len(self.display_file) + 1}"
+                            self.lista_obj.append((nome_final, curva))
+                            self.display_file.append((nome_final, curva))
+                            self.lista_objetos.insert(END, nome_final)
+                            break
+
+                    except Exception:
+                        messagebox.showerror("Erro", "Entrada inválida!\nDigite 4 pontos no formato: (x1,y1),(x2,y2),(x3,y3),(x4,y4)")
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2),...",parent=self.root )
@@ -490,7 +481,6 @@ class App:
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
-            print ("DEBUG REDESENHAR")
             obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
 
     def desenhar_eixos(self):
