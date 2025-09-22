@@ -4,11 +4,9 @@ class Curva(ObjetoGrafico):
 
     def __init__(self, pontos, cor="#FF0000", window = None):
         super().__init__(pontos, cor, window)
+        self.tipo_objeto = "Curva"
         self.segmentos = []
         self.steps = 100
-        print("debug")
-        #self.adicionar_curva(self.pontos)
-
 
     def desenhar(self, canvas, window, scn, viewport):
 
@@ -16,8 +14,7 @@ class Curva(ObjetoGrafico):
             self.segmentos = []
             self.adicionar_curva(self.pontos)
 
-        print ("DEBUG VAI desenhar")
-        # ALtera self.pontos
+        # Altera self.pontos
         self.todos_pontos(self.steps)
 
         # usa o polígono recortado
@@ -25,12 +22,8 @@ class Curva(ObjetoGrafico):
 
         if not pontos_clipados:
             return  # nada para desenhar
-        
-        print(" debug todos pontos" , self.pontos)
+   
         for i in range(len(pontos_clipados)-1):
-            #x1,y1 = pontos_clipados[i]
-            #x2,y2 = pontos_clipados[i+1]
-
              # aplica rotação on-the-fly
             xr1, yr1 = self.rotacao_window(*pontos_clipados[i])
             xr2, yr2 = self.rotacao_window(*pontos_clipados[(i+1)])  # conecta último com o primeiro
@@ -38,16 +31,14 @@ class Curva(ObjetoGrafico):
             xv1, yv1 = scn.world_to_scn_to_viewport(xr1, yr1, window, viewport)
             xv2, yv2 = scn.world_to_scn_to_viewport(xr2, yr2, window, viewport)
             canvas.create_line(xv1,yv1,xv2,yv2, fill=self.cor, width=2)
-        print ("DEBUG desenhou curva")
 
     def adicionar_curva(self, pontos):
-        print ("DEBUG VAI ADD")
         p0,p1,p2,p3 = pontos
         # Se já houver curvas, garantir G(0) (continuidade de posição)
         if self.segmentos and self.segmentos[-1][3] != p0:
             raise ValueError("Violação de G(0): p0 não coincide com o fim da curva anterior")
         self.segmentos.append([p0, p1, p2, p3])
-        print ("DEBUG adicionou curvas")
+
         
 
     def _pontos_bezier(self, p0, p1, p2, p3, steps=50):

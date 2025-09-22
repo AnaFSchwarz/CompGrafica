@@ -375,7 +375,6 @@ class App:
                     try:
                         dx, dy = map(int, entrada.strip("()").split(","))
                         objeto.transladar(dx/100, dy/100)
-
                         self.redesenhar()
                         break
                     except Exception:

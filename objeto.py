@@ -3,11 +3,12 @@ import numpy as np
 import math
 
 class ObjetoGrafico(ABC):
-    def __init__(self, pontos, cor, window, tipo_clipping = 1):
+    def __init__(self, pontos, cor, window, tipo_objeto = "2D", tipo_clipping = 1):
         self.pontos = [(x/100, y/100) for (x, y) in pontos]
         self.cor = cor
         self.tipo_clipping = tipo_clipping
         self.window = window
+        self.tipo_objeto = tipo_objeto
 
     @abstractmethod
     def desenhar(self, canvas, window, scn, viewport):
@@ -24,6 +25,10 @@ class ObjetoGrafico(ABC):
     
     def multiplicacao_matrizes(self, Matriz):
         novos_pontos = []
+        
+        if self.tipo_objeto == "Curva":
+            self.pontos = self.segmentos[0]
+
         for (x, y) in self.pontos:
             # ponto como vetor linha
             ponto_h = np.array([x, y, 1])
