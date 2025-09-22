@@ -3,11 +3,8 @@ from objeto import ObjetoGrafico
 class Ponto(ObjetoGrafico):
 
     def __init__(self, pontos, cor="#FF0000", window = None):
-        """
-        pontos: lista de tuplas [(x,y), ...]
-        cor: string hexadecimal ou nome de cor (Tkinter)
-        """
         super().__init__(pontos, cor, window)
+        self.tipo_objeto = "Ponto"
 
     def desenhar(self, canvas, window, scn, viewport):
 

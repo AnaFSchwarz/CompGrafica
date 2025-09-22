@@ -11,7 +11,7 @@ TOP    = 8
 class Reta(ObjetoGrafico):
 
     def desenhar(self, canvas, window, scn, viewport):
-        aceito, (xc1, yc1, xc2, yc2) = self.clipping(self.pontos[0][0], self.pontos[0][1], self.pontos[1][0], self.pontos[1][1], window, self.tipo_clipping)
+        aceito, (xc1, yc1, xc2, yc2) = self.clipping(self.pontos[0][0], self.pontos[0][1], self.pontos[1][0], self.pontos[1][1], window)
         (x1, y1) = self.rotacao_window(xc1, yc1)
         (x2, y2) = self.rotacao_window(xc2, yc2)
 
@@ -30,11 +30,11 @@ class Reta(ObjetoGrafico):
         elif y > ymax: code |= TOP
         return code
 
-    def clipping(self, x1, y1, x2, y2, window, tipo):
+    def clipping(self, x1, y1, x2, y2, window):
 
         xmin, xmax, ymin, ymax = window.base_xmin, window.base_xmax, window.base_ymin, window.base_ymax
 
-        if tipo == 1:
+        if self.tipo_clipping.get() == 1:
             """ Algoritmo de Cohen–Sutherland """
             outcode1 = self._compute_outcode(x1, y1, window)
             outcode2 = self._compute_outcode(x2, y2, window)
@@ -75,9 +75,7 @@ class Reta(ObjetoGrafico):
             return aceito, (x1, y1, x2, y2)
         
         else:
-            """
-            Liang–Barsky line clipping.
-            """
+            """ Algoritmo Liang–Barsky line clipping.  """
             dx = x2 - x1
             dy = y2 - y1
 

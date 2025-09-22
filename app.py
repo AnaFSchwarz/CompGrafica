@@ -480,6 +480,7 @@ class App:
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
+            obj.tipo_clipping = self.tipo_clipping
             obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
 
     def desenhar_eixos(self):
