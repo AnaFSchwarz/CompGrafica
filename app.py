@@ -292,7 +292,7 @@ class App:
             if nome_obj is None:  
                 return  
             while True:
-                entrada = simpledialog.askstring("Curva", "Digite 4 pontos no formato: (x1,y1),(x2,y2),(x3,y3),(x4,y4)", parent=self.root)
+                entrada = simpledialog.askstring("Curva", "Digite 4 ou mais pontos no formato: (x1,y1),(x2,y2),(x3,y3)...", parent=self.root)
                 if entrada is None:  # usuário cancelou na segunda caixa
                     return
                 if entrada.strip():
