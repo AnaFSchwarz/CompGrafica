@@ -8,6 +8,7 @@ class Curva(ObjetoGrafico):
         self.tipo_objeto = "Curva"
         self.segmentos = []
         self.steps = 100
+        self.curva_pts = []
 
     def desenhar(self, canvas, window, scn, viewport):
 
@@ -16,8 +17,8 @@ class Curva(ObjetoGrafico):
         #    self.segmentos = []
         #    self.adicionar_curva(self.pontos)
 
-        # Altera self.pontos
-        self.todos_pontos(self.steps)
+        # Não altera self.pontos
+        self.todos_pontos()
 
         # usa o polígono recortado
         pontos_clipados = self.clipping(window)
@@ -35,6 +36,7 @@ class Curva(ObjetoGrafico):
             
             canvas.create_line(xv1,yv1,xv2,yv2, fill=self.cor, width=2)
 
+    # Para curvas de Bezier
     def adicionar_curva(self, pontos):
         p0,p1,p2,p3 = pontos
         # Se já houver curvas, garantir G(0) (continuidade de posição)
@@ -42,16 +44,17 @@ class Curva(ObjetoGrafico):
             raise ValueError("Violação de G(0): p0 não coincide com o fim da curva anterior")
         self.segmentos.append([p0, p1, p2, p3])
 
-    def _pontos_bezier(self, p0, p1, p2, p3, steps=50):
+    # Para curvas de Bezier
+    def _pontos_bezier(self, p0, p1, p2, p3):
         pts = []
-        for i in range(steps+1):
-            t = i/steps
+        for i in range(self.steps+1):
+            t = i/self.steps
             x = (1-t)**3*p0[0] + 3*(1-t)**2*t*p1[0] + 3*(1-t)*t**2*p2[0] + t**3*p3[0]
             y = (1-t)**3*p0[1] + 3*(1-t)**2*t*p1[1] + 3*(1-t)*t**2*p2[1] + t**3*p3[1]
             pts.append((x,y))
         return pts
 
-    def _pontos_bspline_fd(self, p0, p1, p2, p3, steps=50):
+    def _pontos_bspline_fd(self, p0, p1, p2, p3):
         """Gera pontos de um segmento B-Spline cúbica usando Forward Differences"""
         # matriz base da B-Spline cúbica
         M = (1/6) * np.array([
@@ -70,7 +73,7 @@ class Curva(ObjetoGrafico):
         Cy = M @ Gy
 
         # parâmetros
-        dt = 1.0 / steps
+        dt = 1.0 / self.steps
         dt2 = dt * dt
         dt3 = dt * dt * dt
 
@@ -88,17 +91,15 @@ class Curva(ObjetoGrafico):
         dddy = 6*Cy[0]*dt3
 
         pontos = [(x,y)]
-        for _ in range(steps):
+        for _ in range(self.steps):
             x += dx; dx += ddx; ddx += dddx
             y += dy; dy += ddy; ddy += dddy
             pontos.append((x,y))
 
         return pontos
 
-    def todos_pontos(self, steps=50):
+    def todos_pontos(self):
         """Gera os pontos da curva B-Spline a partir de todos os segmentos."""
-        if steps is None:
-            steps = self.steps
         all_pts = []
         n = len(self.pontos)
         if n < 4:
@@ -106,12 +107,14 @@ class Curva(ObjetoGrafico):
 
         for i in range(n-3):
             seg = self._pontos_bspline_fd(self.pontos[i], self.pontos[i+1],
-                                          self.pontos[i+2], self.pontos[i+3], steps)
+                                          self.pontos[i+2], self.pontos[i+3])
             if i > 0:
                 seg = seg[1:]  # evita duplicar o ponto inicial
             all_pts.extend(seg)
 
-        self.pontos = all_pts
+        #self.pontos = all_pts
+        self.curva_pts = all_pts
+
     
     def clipping (self, window):
         """
@@ -122,7 +125,7 @@ class Curva(ObjetoGrafico):
         ymin, ymax = window.base_ymin, window.base_ymax
 
         # Copia os pontos originais
-        subject_polygon = self.pontos[:]
+        subject_polygon = self.curva_pts[:]
 
         # Window é um retângulo -> usamos Sutherland–Hodgman (caso particular do Weiler-Atherton)
         def inside(p, edge):
