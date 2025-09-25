@@ -303,7 +303,7 @@ class App:
                         if cor_escolhida is None:  # se o usuário cancelar
                             cor_escolhida = "#C3E119"
 
-                        if len(pontos) == 4:
+                        if len(pontos) >= 4:
                             curva = Curva(pontos, cor_escolhida, self.window)
                             nome_final = nome_obj or f"Curva{len(self.display_file) + 1}"
                             self.lista_obj.append((nome_final, curva))
