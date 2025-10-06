@@ -7,6 +7,7 @@ from reta import Reta
 from wireframe import Wireframe
 from curva import Curva
 from ponto3D import Ponto3D
+from cubo3D import Cubo3D
 from tkinter import simpledialog, messagebox,filedialog
 from tkinter.colorchooser import askcolor
 import math
@@ -38,6 +39,9 @@ class App:
         self.display_file = []
         self.lista_obj = []
 
+        self.lista_obj3D = []
+        self.display_file3D = []
+
         # Menu lateral
         self._criar_menu()
 
@@ -60,7 +64,7 @@ class App:
         Button(criar_frame, text="Reta", width=6, command=lambda: self.executar_objeto("Reta")).grid(row=0, column=1, padx=2, pady=2)
         Button(criar_frame, text="Wireframe", width=9, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
         Button(criar_frame, text="Curva", width=6, command=lambda: self.executar_objeto("Curva")).grid(row=1, column=0, padx=2, pady=2)
-        Button(criar_frame, text="Cubo padrão", width=6, command=lambda: self.executar_objeto("Cubo_padrao")).grid(row=1, column=1, padx=2, pady=2)
+        Button(criar_frame, text="Cubo 3D", width=9, command=lambda: self.executar_objeto("Cubo_padrao")).grid(row=1, column=1, padx=2, pady=2)
 
         # --- Lista de objetos com Scrollbar ---
         Label(menu_frame, text="Objetos criados:", width=25, bg="#255A75", fg="white",
@@ -320,22 +324,22 @@ class App:
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2),...",parent=self.root )
+        
         elif tipo == "Cubo_padrao":
-                # cria alguns pontos
-                p1 = Ponto3D(1, 0, 0)
-                p2 = Ponto3D(0, 1, 0)
-                p3 = Ponto3D(0, 0, 1)
-
+             
                 # cria um objeto com esses pontos
-                cubo = ObjetoGrafico3D([p1, p2, p3])
 
-                print("Antes da rotação:")
-                print(cubo)
+                #No teste, pontos fixos para no objeto cubo:
+                pontos = []
+                cor_escolhida = "#0D813F"
+                cubo = Cubo3D(pontos, cor_escolhida, self.window, tamanho = 2)
+                nome_obj = "CUbinho"
+                nome_final = nome_obj or f"Cubo{len(self.display_file3D) + 1}"
+                self.lista_obj3D.append((nome_final, cubo))
+                self.display_file3D.append((nome_final, cubo))
+                self.lista_objetos.insert(END, nome_final)
 
-                cubo.rotacionar_z(90)
-
-                print("\nDepois da rotação em Z:")
-                print(cubo)
+                cubo.desenhar(self.canvas, 600, 600)
 
         self.redesenhar()
     
@@ -501,6 +505,9 @@ class App:
         for nome, obj in self.display_file:
             obj.tipo_clipping = self.tipo_clipping
             obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
+        
+        for nome, obj in self.display_file3D:
+            obj.desenhar(self.canvas, self.canvas_height, self.canvas_width)
 
     def desenhar_eixos(self):
         ang = math.radians(self.window.angulo)

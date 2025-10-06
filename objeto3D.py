@@ -4,11 +4,21 @@ from abc import ABC, abstractmethod
 
 
 class ObjetoGrafico3D(ABC):
-    def __init__(self, pontos):
-        """pontos: lista de objetos Ponto3D"""
-        self.pontos = pontos
+    def __init__(self, pontos, cor, window, tipo_objeto = "3D", tipo_clipping = 1):
+        self.pontos = [(x/100, y/100, z/100) for (x, y, z) in pontos]
+        self.cor = cor
+        self.tipo_clipping = tipo_clipping
+        self.window = window
+        self.tipo_objeto = tipo_objeto
 
-    # ---------- TRANSFORMAÇÕES BÁSICAS ----------
+    @abstractmethod
+    def desenhar(self, canvas, largura, altura, cor="#00FF00"):
+        pass
+
+    #@abstractmethod
+    #def clipping(self, pontos, window):
+    #    pass
+
     def _aplicar_transformacao(self, matriz):
         for p in self.pontos:
             p.transformar(matriz)
@@ -92,6 +102,8 @@ class ObjetoGrafico3D(ABC):
 
         matriz_total = trans_volta @ matriz_rot @ trans_origem
         self._aplicar_transformacao(matriz_total)
+
+
 
     #def __repr__(self):
     #    return "\n".join(str(s) for s in self.segmentos)
