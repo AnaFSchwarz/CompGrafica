@@ -4,14 +4,14 @@ from abc import ABC, abstractmethod
 
 
 class ObjetoGrafico3D(ABC):
-    def __init__(self, pontos, cor, window, tipo_objeto = "3D", tipo_clipping = 1):
+    def __init__(self, pontos, cor, arestas, window, tipo_objeto = "3D", tipo_clipping = 1):
         self.pontos = [(x/100, y/100, z/100) for (x, y, z) in pontos]
         self.cor = cor
         self.tipo_clipping = tipo_clipping
         self.window = window
         self.tipo_objeto = tipo_objeto
+        self.arestas = arestas
 
-    @abstractmethod
     def desenhar(self, canvas, largura, altura, cor="#00FF00"):
         pass
 
@@ -107,3 +107,14 @@ class ObjetoGrafico3D(ABC):
 
     #def __repr__(self):
     #    return "\n".join(str(s) for s in self.segmentos)
+
+    def projetar_paralela_ortogonal(self):
+        """
+        Como o VPN deve ser (0,0,1), projetamos 'descartando z'
+        Retorna lista de segmentos 2D projetados
+        """
+        proj = []
+        for i, j in self.arestas:
+            p1, p2 = self.pontos[i], self.pontos[j]
+            proj.append(((p1[0], p1[1]), (p2[0], p2[1])))
+        return proj

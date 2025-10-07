@@ -64,7 +64,8 @@ class App:
         Button(criar_frame, text="Reta", width=6, command=lambda: self.executar_objeto("Reta")).grid(row=0, column=1, padx=2, pady=2)
         Button(criar_frame, text="Wireframe", width=9, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
         Button(criar_frame, text="Curva", width=6, command=lambda: self.executar_objeto("Curva")).grid(row=1, column=0, padx=2, pady=2)
-        Button(criar_frame, text="Cubo 3D", width=9, command=lambda: self.executar_objeto("Cubo_padrao")).grid(row=1, column=1, padx=2, pady=2)
+        Button(criar_frame, text="Objeto3D", width=9, command=lambda: self.executar_objeto("Objeto3D")).grid(row=1, column=1, padx=2, pady=2)
+        # Button(criar_frame, text="Cubo3D", width=9, command=lambda: self.executar_objeto("Cubo_padrao")).grid(row=1, column=2, padx=2, pady=2)
 
         # --- Lista de objetos com Scrollbar ---
         Label(menu_frame, text="Objetos criados:", width=25, bg="#255A75", fg="white",
@@ -325,6 +326,54 @@ class App:
                         # Se o usuário só apertar Enter sem digitar nada
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2),...",parent=self.root )
         
+        elif tipo == "Objeto3D":
+            nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o Objeto3D:", parent=self.root)
+            if nome_obj is None:
+                return  
+
+            while True:
+                entrada = simpledialog.askstring(
+                    "Objeto3D",
+                    "Digite as arestas no formato: (x1,y1,z1),(x2,y2,z2); (x3,y3,z3),(x4,y4,z4)...",
+                    parent=self.root
+                )
+                if entrada is None:
+                    return
+                if entrada.strip():
+                    try:
+                        # Quebra em pares de pontos
+                        segmentos_raw = entrada.split(";")
+                        pontos_dict = {}  # para evitar duplicatas
+                        arestas = []
+                        for seg in segmentos_raw:
+                            p1_str, p2_str = seg.split("),(")
+                            p1 = tuple(map(float, p1_str.strip(" ()").split(",")))
+                            p2 = tuple(map(float, p2_str.strip(" ()").split(",")))
+
+                            for p in [p1, p2]:
+                                if p not in pontos_dict:
+                                    pontos_dict[p] = len(pontos_dict)
+                            
+                            arestas.append((pontos_dict[p1], pontos_dict[p2]))
+                        
+                        pontos = list(pontos_dict.keys())
+
+                        cor_escolhida = askcolor(title="Escolha a cor do objeto", parent=self.root)[1]
+                        if cor_escolhida is None:
+                            cor_escolhida = "#000000"
+
+                        obj3d = ObjetoGrafico3D(pontos, cor_escolhida, arestas, self.window)
+                        nome_final = nome_obj or f"Objeto3D{len(self.display_file) + 1}"
+                        self.lista_obj.append((nome_final, obj3d))
+                        self.display_file.append((nome_final, obj3d))
+                        self.lista_objetos.insert(END, nome_final)
+                        break
+
+                    except Exception as e:
+                        messagebox.showerror("Erro", f"Entrada inválida!\n{e}")
+                else:
+                    messagebox.showerror("Erro", "Você precisa digitar no formato (x1,y1,z1),(x2,y2,z2); ...", parent=self.root)
+        
         elif tipo == "Cubo_padrao":
              
                 # cria um objeto com esses pontos
@@ -333,7 +382,7 @@ class App:
                 pontos = []
                 cor_escolhida = "#0D813F"
                 cubo = Cubo3D(pontos, cor_escolhida, self.window, tamanho = 2)
-                nome_obj = "CUbinho"
+                nome_obj = "Cubinho"
                 nome_final = nome_obj or f"Cubo{len(self.display_file3D) + 1}"
                 self.lista_obj3D.append((nome_final, cubo))
                 self.display_file3D.append((nome_final, cubo))
@@ -500,14 +549,29 @@ class App:
             Button(popup, text="Confirmar", command=confirmar).pack(pady=15)
 
     def redesenhar(self):
+        # self.canvas.delete("all")
+        # self.desenhar_eixos()
+        # for nome, obj in self.display_file:
+        #     obj.tipo_clipping = self.tipo_clipping
+        #     obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
+        
+        # for nome, obj in self.display_file3D:
+        #     obj.desenhar(self.canvas, self.canvas_height, self.canvas_width)
+
+        
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
-            obj.tipo_clipping = self.tipo_clipping
-            obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
-        
-        for nome, obj in self.display_file3D:
-            obj.desenhar(self.canvas, self.canvas_height, self.canvas_width)
+            if isinstance(obj, ObjetoGrafico3D):
+                # projeção ortogonal do 3D para 2D
+                proj = obj.projetar_paralela_ortogonal()
+                for (x1, y1), (x2, y2) in proj:
+                    xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
+                    xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
+                    self.canvas.create_line(xv1, yv1, xv2, yv2, fill=obj.cor, width=2)
+            else:
+                obj.tipo_clipping = self.tipo_clipping
+                obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
 
     def desenhar_eixos(self):
         ang = math.radians(self.window.angulo)
