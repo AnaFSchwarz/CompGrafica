@@ -8,29 +8,28 @@ class DescritorOBJ:
         pass
 
     # ---------- Escrita ----------
-    def exportar(self, display_file: List[Tuple[str, Any]], filename: str):
+    def exportar(self, objeto_selecionado, nome, filename: str):
         """
         Gera um .obj com todos os vértices e linhas (l) por objeto.
         """
         vertices = []  # lista global de (x,y)
-        object_blocks = []  # cada item: dict{name, color, vert_indices_list}
+        object_blocks = []
 
-        for nome, obj in display_file:
-            pts = obj.pontos
-            if not pts:
-                continue
+        pts = [[coord * 100 for coord in ponto] for ponto in objeto_selecionado.pontos]
+
+        if pts:  # só processa se houver pontos
             start_index = len(vertices) + 1
             indices = list(range(start_index, start_index + len(pts)))
             vertices.extend(pts)
 
-            color = getattr(obj, 'cor', None)
+            color = getattr(objeto_selecionado, 'cor', None)
 
             object_blocks.append({
                 'name': nome,
                 'color': color,
                 'indices': indices,
-                'tipo': type(obj).__name__
-            })
+                'tipo': type(objeto_selecionado).__name__
+        })
 
         # escreve arquivo
         with open(filename, 'w', encoding='utf-8') as f:

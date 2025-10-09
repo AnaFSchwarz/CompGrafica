@@ -141,19 +141,19 @@ class App:
 
         Radiobutton(clipping_frame, text="Cohen-Sutherland",
                     variable=self.tipo_clipping, value=1,
-                    bg="white").pack(side="left", padx=5)
+                    bg="white").pack(side="left", padx=3)
 
         Radiobutton(clipping_frame, text="Liang–Barsky",
                     variable=self.tipo_clipping, value=2,
-                    bg="white").pack(side="left", padx=5)
+                    bg="white").pack(side="left", padx=3)
     
 
         # --- Exportar e Importar (mesma linha) ---
         final_frame = Frame(menu_frame, bg="#F0F4F8")
         final_frame.pack(side='bottom', pady=10, padx=5, fill='x')
 
-        Button(final_frame, text="Exportar", width=12, command=self.exportar_obj).pack(side='left', padx=2)
-        Button(final_frame, text="Importar", width=12, command=self.importar_obj).pack(side='left', padx=2)
+        # Button(final_frame, text="Exportar", width=12, command=self.exportar_obj).pack(side='left', padx=2)
+        Button(final_frame, text="Importar", width=12, command=self.importar_obj).pack(side='left', padx=4)
 
 
 
@@ -431,11 +431,12 @@ class App:
             menu.add_command(label="Transladar", command=lambda: self.modificar_objeto("Transladar", objeto,nome))
             menu.add_command(label="Escalonar", command=lambda: self.modificar_objeto("Escalonar", objeto,nome))
             menu.add_command(label="Rotacionar", command=lambda: self.modificar_objeto("Rotacionar", objeto,nome))
+            menu.add_command(label="Exportar", command=lambda: self.exportar_obj(objeto, nome))
 
         # Abre o menu na posição do clique
             menu.tk_popup(event.x_root, event.y_root)
 
-    def modificar_objeto(self, acao_escolhida, objeto,nome):
+    def modificar_objeto(self, acao_escolhida, objeto, nome):
         
         if acao_escolhida == "Transladar":
 
@@ -610,16 +611,13 @@ class App:
         self.canvas.create_polygon(pts, outline="red", fill="", width=3)
 
 
-    def exportar_obj(self):
-        if not self.display_file:
-            messagebox.showinfo("Info", "Não há objetos para exportar.")
-            return
+    def exportar_obj(self, objeto_selecionado, nome_objeto):
         filename = filedialog.asksaveasfilename(
             defaultextension=".obj", filetypes=[("Wavefront OBJ", "*.obj")])
         if not filename:
             return
         try:
-            self.descritor.exportar(self.display_file, filename)
+            self.descritor.exportar(objeto_selecionado, nome_objeto, filename)
             messagebox.showinfo("Exportar", f"Arquivo exportado com sucesso:\n{filename}")
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
