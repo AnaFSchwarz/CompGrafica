@@ -21,13 +21,18 @@ class App:
     def __init__(self):
         self.root = Tk()
         self.root.title("Sistema Gráfico Interativo 2D")
-        self.root.geometry("1050x750")
+        #self.root.geometry("1050x750")
+        try:
+            self.root.state('zoomed')
+        except:
+            self.root.attributes('-zoomed', True)
+
 
         # Canvas
         self.canvas_width = 750
         self.canvas_height = 700
         self.canvas = Canvas(self.root, width=self.canvas_width, height=self.canvas_height, bg="white")
-        self.canvas.pack(side="right", fill="both", expand=False)
+        self.canvas.pack(side="right", fill="both", expand=True)
         self.descritor = DescritorOBJ()
 
         # Window e Viewport
@@ -54,7 +59,7 @@ class App:
         self.desenhar_eixos()
 
         # --- Criar objeto ---
-        Label(menu_frame, text="Criar Objeto:", width=25, bg="#255A75", fg="white",
+        Label(menu_frame, text="Criar Objeto:", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
         
         criar_frame = Frame(menu_frame, bg="#F0F4F8")
@@ -68,7 +73,7 @@ class App:
         # Button(criar_frame, text="Cubo3D", width=9, command=lambda: self.executar_objeto("Cubo_padrao")).grid(row=1, column=2, padx=2, pady=2)
 
         # --- Lista de objetos com Scrollbar ---
-        Label(menu_frame, text="Objetos criados:", width=25, bg="#255A75", fg="white",
+        Label(menu_frame, text="Objetos criados:", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
 
         list_frame = Frame(menu_frame)
@@ -88,7 +93,7 @@ class App:
         Button(menu_frame, text="Limpar Tela", width=20, command=self.limpar_tela).pack(pady=5)
 
         # --- Movimento (maior e centralizado) ---
-        Label(menu_frame, text="Movimento:", width=25, bg="#255A75", fg="white",
+        Label(menu_frame, text="Movimento:", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
 
         movimento_frame = Frame(menu_frame, bg="#F0F4F8")
@@ -107,7 +112,7 @@ class App:
             command=lambda: self.mover_window(0,-self.window.get_tam()/8)).grid(row=2, column=1, padx=2, pady=2)
 
         # --- Zoom ---
-        Label(menu_frame, text="Zoom (%):", width=25, bg="#255A75", fg="white",
+        Label(menu_frame, text="Zoom (%):", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
 
         zoom_frame = Frame(menu_frame, bg="#F0F4F8")
@@ -119,7 +124,7 @@ class App:
         Button(zoom_frame, text="Aplicar Zoom", width=15, command=self.aplicar_zoom).pack(side='left', padx=2)
 
         # --- Rotação Window ---
-        Label(menu_frame, text="Rotação Window:", width=25, bg="#255A75", fg="white",
+        Label(menu_frame, text="Rotação Window:", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
 
         rotation_frame = Frame(menu_frame, bg="#F0F4F8")
@@ -133,7 +138,7 @@ class App:
         Label(rotation_frame, textvariable=self.angulo_var, bg="#F0F4F8").grid(row=1, column=0, columnspan=2, pady=2)
 
         # --- Escolha do algoritmo de clipping --- 
-        Label(menu_frame, text="Algoritmo de clipping retas", width=25, bg="#255A75", fg="white",
+        Label(menu_frame, text="Algoritmo de clipping retas", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
         self.tipo_clipping = IntVar(value=1)
         clipping_frame = Frame(menu_frame, bg="white")
