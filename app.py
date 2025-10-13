@@ -2,6 +2,7 @@ from tkinter import *
 from window import Window
 from viewport import Viewport
 from scn import SCN
+from objeto import ObjetoGrafico
 from ponto import Ponto
 from reta import Reta
 from wireframe import Wireframe
@@ -46,11 +47,12 @@ class App:
 
         self.lista_obj3D = []
         self.display_file3D = []
-
+        
         # Menu lateral
         self._criar_menu()
 
         self.run()
+
 
     def _criar_menu(self):
         menu_frame = Frame(self.root, bg="#F0F4F8", width=250)
@@ -82,7 +84,7 @@ class App:
         self.lista_objetos = Listbox(list_frame, height=8, width=30, exportselection=False)
         self.lista_objetos.pack(side='left', fill='both', expand=True)
         self.lista_objetos.bind("<<ListboxSelect>>", self.selecao_objeto)
-        self.lista_objetos.bind("<Button-3>", self.selecao_menu_objeto)
+        self.lista_objetos.bind("<Button-3>", self.selecao_menu_objeto) 
 
         scrollbar = Scrollbar(list_frame)
         scrollbar.pack(side='right', fill='y')
@@ -160,7 +162,15 @@ class App:
         # Button(final_frame, text="Exportar", width=12, command=self.exportar_obj).pack(side='left', padx=2)
         Button(final_frame, text="Importar", width=12, command=self.importar_obj).pack(side='left', padx=4)
 
+        
+        
+        # CRIA OBJETOS BÁSICOS:
+        #self.importar_obj(filename="CuboMagic1.obj")
 
+        #self.importar_obj(filename="Piramide3D1.obj")
+        self.importar_obj(filename="Ponto2.obj")
+        self.importar_obj(filename="Reta2.obj")
+        self.importar_obj(filename="Casa2.obj")
 
     def limpar_tela(self):
         self.canvas.delete("all")
@@ -347,10 +357,14 @@ class App:
                 if entrada.strip():
                     try:
                         # Quebra em pares de pontos
-                        segmentos_raw = entrada.split(";")
+                        segmentos_raw = [s.strip() for s in entrada.split(";") if s.strip()]
                         pontos_dict = {}  # para evitar duplicatas
                         arestas = []
                         for seg in segmentos_raw:
+                            # garante que contém dois pontos
+                            if "),(" not in seg:
+                                raise ValueError(f"Segmento mal formatado: {seg}")
+
                             p1_str, p2_str = seg.split("),(")
                             p1 = tuple(map(float, p1_str.strip(" ()").split(",")))
                             p2 = tuple(map(float, p2_str.strip(" ()").split(",")))
@@ -617,18 +631,35 @@ class App:
 
 
     def exportar_obj(self, objeto_selecionado, nome_objeto):
-        filename = filedialog.asksaveasfilename(
-            defaultextension=".obj", filetypes=[("Wavefront OBJ", "*.obj")])
-        if not filename:
-            return
-        try:
-            self.descritor.exportar(objeto_selecionado, nome_objeto, filename)
-            messagebox.showinfo("Exportar", f"Arquivo exportado com sucesso:\n{filename}")
-        except Exception as e:
-            messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
 
-    def importar_obj(self):
-        filename = filedialog.askopenfilename(filetypes=[("Wavefront OBJ", "*.obj")])
+        if isinstance(objeto_selecionado, ObjetoGrafico) :
+            filename = filedialog.asksaveasfilename(
+                defaultextension=".obj", filetypes=[("Wavefront OBJ", "*.obj")])
+            if not filename:
+                return
+            try:
+                self.descritor.exportar_2D(objeto_selecionado, nome_objeto, filename)
+                messagebox.showinfo("Exportar", f"Arquivo exportado com sucesso:\n{filename}")
+            except Exception as e:
+                messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
+
+        elif isinstance(objeto_selecionado,ObjetoGrafico3D):
+            print("debug é 3d")
+            filename = filedialog.asksaveasfilename(
+                defaultextension=".obj", filetypes=[("Wavefront OBJ", "*.obj")])
+            if not filename:
+                return
+            try:
+                self.descritor.exportar_3D(objeto_selecionado, nome_objeto, filename)
+                messagebox.showinfo("Exportar", f"Arquivo exportado com sucesso:\n{filename}")
+            except Exception as e:
+                messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
+        else:
+            print("de3bug fez nada")
+
+    def importar_obj(self, filename=None):
+        if filename == None:
+            filename = filedialog.askopenfilename(filetypes=[("Wavefront OBJ", "*.obj")])
         if not filename:
             return
         try:

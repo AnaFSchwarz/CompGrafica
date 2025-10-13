@@ -8,7 +8,7 @@ class DescritorOBJ:
         pass
 
     # ---------- Escrita ----------
-    def exportar(self, objeto_selecionado, nome, filename: str):
+    def exportar_2D(self, objeto_selecionado, nome, filename: str):
         """
         Gera um .obj com todos os vértices e linhas (l) por objeto.
         """
@@ -23,12 +23,14 @@ class DescritorOBJ:
             vertices.extend(pts)
 
             color = getattr(objeto_selecionado, 'cor', None)
+            tipo_clipping = getattr(objeto_selecionado, 'tipo_clipping', None)
 
             object_blocks.append({
                 'name': nome,
                 'color': color,
                 'indices': indices,
-                'tipo': type(objeto_selecionado).__name__
+                'tipo': type(objeto_selecionado).__name__,
+                'tipo_clipping': tipo_clipping
         })
 
         # escreve arquivo
@@ -42,12 +44,67 @@ class DescritorOBJ:
                 f.write(f"# name: {blk['name']}\n")
                 if blk['color']:
                     f.write(f"# color: {blk['color']}\n")
+                if blk['tipo_clipping']:
+                    f.write(f"# tipo_clipping: {blk['tipo_clipping']}\n")
                 if blk['tipo'] == 'Ponto' or len(blk['indices']) == 1:
                     f.write(f"p {blk['indices'][0]}\n")
                 else:
                     indices_str = " ".join(str(i) for i in blk['indices'])
                     f.write(f"l {indices_str}\n")
                 f.write("\n")
+
+    def exportar_3D(self, objeto_selecionado, nome, filename: str):
+        """
+        Exporta um objeto 3D no formato .obj, incluindo vértices (v) e arestas (l).
+        """
+        vertices = []
+        object_blocks = []
+
+        # Pega todos os pontos (x, y, z)
+        pts = [tuple(map(float, ponto)) for ponto in objeto_selecionado.pontos]
+
+        if pts:
+            start_index = len(vertices) + 1
+            indices = list(range(start_index, start_index + len(pts)))
+            vertices.extend(pts)
+
+            color = getattr(objeto_selecionado, 'cor', None)
+            arestas = getattr(objeto_selecionado, 'arestas', [])
+
+            object_blocks.append({
+                'name': nome,
+                'color': color,
+                'indices': indices,
+                'arestas': arestas,
+                'tipo': type(objeto_selecionado).__name__
+            })
+
+        # Escreve o arquivo OBJ
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write("# Exported by DescritorOBJ 3D\n")
+
+            # Vértices (x, y, z)
+            for x, y, z in vertices:
+                f.write(f"v {x:.6f} {y:.6f} {z:.6f}\n")
+            f.write("\n")
+
+            # Blocos de objeto
+            for blk in object_blocks:
+                f.write(f"o {blk['name']}\n")
+                if blk['color']:
+                    f.write(f"# color: {blk['color']}\n")
+
+                # Escreve arestas (linhas conectando os vértices)
+                if blk['arestas']:
+                    for a, b in blk['arestas']:
+                        f.write(f"l {blk['indices'][a]} {blk['indices'][b]}\n")
+                else:
+                    # Caso sem arestas, escreve pontos isolados
+                    for idx in blk['indices']:
+                        f.write(f"p {idx}\n")
+                f.write("\n")
+
+
 
     # ---------- Leitura ----------
     def importar(self, filename: str, window) -> List[Tuple[str, Any]]:
