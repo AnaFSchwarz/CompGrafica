@@ -155,22 +155,22 @@ class App:
                     bg="white").pack(side="left", padx=3)
     
 
-        # --- Exportar e Importar (mesma linha) ---
+        # --- Importar 2D e 3D ---
         final_frame = Frame(menu_frame, bg="#F0F4F8")
         final_frame.pack(side='bottom', pady=10, padx=5, fill='x')
 
-        # Button(final_frame, text="Exportar", width=12, command=self.exportar_obj).pack(side='left', padx=2)
-        Button(final_frame, text="Importar", width=12, command=self.importar_obj).pack(side='left', padx=4)
+        from functools import partial
 
-        
+        Button(final_frame, text="Importar 2D", width=12, command=partial(self.importar_obj, "2D")).pack(side='left', padx=2)
+        Button(final_frame, text="Importar 3D", width=12, command=partial(self.importar_obj, "3D")).pack(side='left', padx=4)
         
         # CRIA OBJETOS BÁSICOS:
-        #self.importar_obj(filename="CuboMagic1.obj")
-
-        #self.importar_obj(filename="Piramide3D1.obj")
-        self.importar_obj(filename="Ponto2.obj")
-        self.importar_obj(filename="Reta2.obj")
-        self.importar_obj(filename="Casa2.obj")
+       
+        self.importar_obj("2D", filename="Ponto2.obj")
+        self.importar_obj("2D", filename="Reta2.obj")
+        self.importar_obj("2D", filename="Casa2.obj")
+        self.importar_obj("3D", filename="CuboMagic1.obj")
+        self.importar_obj("3D", filename="Piramide3D6.obj")
 
     def limpar_tela(self):
         self.canvas.delete("all")
@@ -392,22 +392,7 @@ class App:
                         messagebox.showerror("Erro", f"Entrada inválida!\n{e}")
                 else:
                     messagebox.showerror("Erro", "Você precisa digitar no formato (x1,y1,z1),(x2,y2,z2); ...", parent=self.root)
-        
-        elif tipo == "Cubo_padrao":
-             
-                # cria um objeto com esses pontos
 
-                #No teste, pontos fixos para no objeto cubo:
-                pontos = []
-                cor_escolhida = "#0D813F"
-                cubo = Cubo3D(pontos, cor_escolhida, self.window, tamanho = 2)
-                nome_obj = "Cubinho"
-                nome_final = nome_obj or f"Cubo{len(self.display_file3D) + 1}"
-                self.lista_obj3D.append((nome_final, cubo))
-                self.display_file3D.append((nome_final, cubo))
-                self.lista_objetos.insert(END, nome_final)
-
-                cubo.desenhar(self.canvas, 600, 600)
 
         self.redesenhar()
     
@@ -644,7 +629,6 @@ class App:
                 messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
 
         elif isinstance(objeto_selecionado,ObjetoGrafico3D):
-            print("debug é 3d")
             filename = filedialog.asksaveasfilename(
                 defaultextension=".obj", filetypes=[("Wavefront OBJ", "*.obj")])
             if not filename:
@@ -654,24 +638,27 @@ class App:
                 messagebox.showinfo("Exportar", f"Arquivo exportado com sucesso:\n{filename}")
             except Exception as e:
                 messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
-        else:
-            print("de3bug fez nada")
+    
 
-    def importar_obj(self, filename=None):
-        if filename == None:
+    def importar_obj(self, botao, filename=None):
+
+        if filename is None:
             filename = filedialog.askopenfilename(filetypes=[("Wavefront OBJ", "*.obj")])
         if not filename:
             return
         try:
-            objs_importados = self.descritor.importar(filename, self.window)
+            if botao == "2D":
+                objs_importados = self.descritor.importar2D(filename, self.window)
+            else:
+                objs_importados = self.descritor.importar3D(filename, self.window)
             for nome, obj in objs_importados:
                 self.lista_obj.append((nome, obj))
                 self.display_file.append((nome, obj))
                 self.lista_objetos.insert(END, nome)
             self.redesenhar()
-            messagebox.showinfo("Importar", f"{len(objs_importados)} objetos importados com sucesso.")
+            messagebox.showinfo("Importar", f"{len(objs_importados)} objeto importado com sucesso.")
         except Exception as e:
-            messagebox.showerror("Erro", f"Falha ao importar:\n{e}")
+            messagebox.showerror("Erro", f"Falha ao importar 3D:\n{e}")
 
 
     def run(self):
