@@ -171,6 +171,7 @@ class App:
         self.importar_obj("2D", filename="Casa2.obj")
         self.importar_obj("3D", filename="CuboMagic1.obj")
         self.importar_obj("3D", filename="Piramide3D6.obj")
+        self.importar_obj("3D", filename="Paralelepipedo1.obj")
 
     def limpar_tela(self):
         self.canvas.delete("all")
