@@ -20,7 +20,6 @@ class ObjetoGrafico3D(ABC):
     #    pass
 
     def _aplicar_transformacao(self, matriz):
-        print("debug pontos ", self.pontos)
         novos_pontos = []
         for (x,y,z) in self.pontos:
             ponto_h = np.array([x,y,z,1])
@@ -35,7 +34,6 @@ class ObjetoGrafico3D(ABC):
             [0, 0, 1, dz],
             [0, 0, 0, 1]
         ])
-        print("debug transladar matriz ", matriz)
         self._aplicar_transformacao(matriz)
 
     def escalonar(self, sx, sy, sz=0):
@@ -47,6 +45,21 @@ class ObjetoGrafico3D(ABC):
         ])
         self._aplicar_transformacao(matriz)
 
+    def centro(self):
+        xs = [p[0] for p in self.pontos]
+        ys = [p[1] for p in self.pontos]
+        zs = [p[2] for p in self.pontos]
+        return sum(xs)/len(xs), sum(ys)/len(ys), sum(zs)/len(zs)
+
+    def rotacionar(self, angulo, cx=0, cy=0, cz=0):
+
+        if cx != 0:
+            self.rotacionar_x(angulo)
+        if cy != 0:
+            self.rotacionar_y(angulo)
+        if cz != 0:
+            self.rotacionar_z(angulo)
+        
     def rotacionar_x(self, angulo):
         a = radians(angulo)
         matriz = np.array([

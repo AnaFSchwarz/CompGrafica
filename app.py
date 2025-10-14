@@ -8,13 +8,10 @@ from reta import Reta
 from wireframe import Wireframe
 from curva import Curva
 from ponto3D import Ponto3D
-from cubo3D import Cubo3D
 from tkinter import simpledialog, messagebox,filedialog
 from tkinter.colorchooser import askcolor
 import math
 from descritor_obj import DescritorOBJ
-from tkinter.filedialog import asksaveasfilename, askopenfilename
-
 from objeto3D import ObjetoGrafico3D
 
 
@@ -22,12 +19,10 @@ class App:
     def __init__(self):
         self.root = Tk()
         self.root.title("Sistema Gráfico Interativo 2D")
-        #self.root.geometry("1050x750")
         try:
             self.root.state('zoomed')
         except:
             self.root.attributes('-zoomed', True)
-
 
         # Canvas
         self.canvas_width = 750
@@ -72,8 +67,7 @@ class App:
         Button(criar_frame, text="Wireframe", width=9, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
         Button(criar_frame, text="Curva", width=6, command=lambda: self.executar_objeto("Curva")).grid(row=1, column=0, padx=2, pady=2)
         Button(criar_frame, text="Objeto3D", width=9, command=lambda: self.executar_objeto("Objeto3D")).grid(row=1, column=1, padx=2, pady=2)
-        # Button(criar_frame, text="Cubo3D", width=9, command=lambda: self.executar_objeto("Cubo_padrao")).grid(row=1, column=2, padx=2, pady=2)
-
+        
         # --- Lista de objetos com Scrollbar ---
         Label(menu_frame, text="Objetos criados:", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
@@ -165,12 +159,11 @@ class App:
         Button(final_frame, text="Importar 3D", width=12, command=partial(self.importar_obj, "3D")).pack(side='left', padx=4)
         
         # CRIA OBJETOS BÁSICOS:
-       
-        #self.importar_obj("2D", filename="Ponto2.obj")
-        #self.importar_obj("2D", filename="Reta2.obj")
-        #self.importar_obj("2D", filename="Casa2.obj")
-        #self.importar_obj("3D", filename="CuboMagic1.obj")
-        #self.importar_obj("3D", filename="Piramide3D6.obj")
+        self.importar_obj("2D", filename="Ponto2.obj")
+        self.importar_obj("2D", filename="Reta2.obj")
+        self.importar_obj("2D", filename="Casa2.obj")
+        self.importar_obj("3D", filename="CuboMagic1.obj")
+        self.importar_obj("3D", filename="Piramide3D6.obj")
         self.importar_obj("3D", filename="Paralelepipedo1.obj")
 
     def limpar_tela(self):
@@ -246,9 +239,7 @@ class App:
                         self.display_file.append((nome_final, ponto))
                         self.lista_objetos.insert(END, nome_final)
                         break
-
                     except Exception:
-                        
                         messagebox.showerror("Erro", "Entrada inválida!\nDigite no formato (x,y).")
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
@@ -528,11 +519,14 @@ class App:
                     popup.focus_force()
                     return
 
-                cx, cy = 0, 0  # padrão: origem
+                cx, cy, cz = 0, 0, 0 # padrão: origem
 
-                if acao == "op2":
+                if acao == "op2" and isinstance(objeto, ObjetoGrafico):
                     # Rotação em torno do centro do objeto
                     cx, cy = objeto.centro()
+
+                elif acao == "op2" and isinstance(objeto, ObjetoGrafico3D):
+                    cx, cy, cz = objeto.centro()
 
                 elif acao == "op3":
                     # Rotação em torno de ponto qualquer
@@ -540,6 +534,7 @@ class App:
                         cx, cy = map(int, ponto.strip("() ").split(","))
                         cx /= 100
                         cy /= 100
+                        #cz /= 100
                     except Exception:
                         messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x,y)")
                         popup.lift()
@@ -547,7 +542,10 @@ class App:
                         return
 
                 # chama a rotação correta
-                objeto.rotacionar(ang, cx, cy)
+                if isinstance(objeto, ObjetoGrafico):
+                    objeto.rotacionar(ang, cx, cy)
+                else:
+                    objeto.rotacionar(ang, cx, cy, cz)
                 self.redesenhar()
                 popup.destroy()
 
