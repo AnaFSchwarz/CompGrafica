@@ -166,11 +166,11 @@ class App:
         
         # CRIA OBJETOS BÁSICOS:
        
-        self.importar_obj("2D", filename="Ponto2.obj")
-        self.importar_obj("2D", filename="Reta2.obj")
-        self.importar_obj("2D", filename="Casa2.obj")
-        self.importar_obj("3D", filename="CuboMagic1.obj")
-        self.importar_obj("3D", filename="Piramide3D6.obj")
+        #self.importar_obj("2D", filename="Ponto2.obj")
+        #self.importar_obj("2D", filename="Reta2.obj")
+        #self.importar_obj("2D", filename="Casa2.obj")
+        #self.importar_obj("3D", filename="CuboMagic1.obj")
+        #self.importar_obj("3D", filename="Piramide3D6.obj")
         self.importar_obj("3D", filename="Paralelepipedo1.obj")
 
     def limpar_tela(self):
@@ -210,7 +210,6 @@ class App:
         # Deve rotacionar para direita
         if direcao_botao == "botao_esquerda":
             self.window.angulo += 30
-            
             
         # Deve rotacionar para esquerda
         else:
@@ -455,8 +454,8 @@ class App:
                         objeto.transladar(dx/100, dy/100)
                         self.redesenhar()
                         break
-                    except Exception:
-                        messagebox.showerror("Erro", "Entrada inválida!\nDigite o ponto no formato: (x1,y1)")
+                    except Exception as e:
+                        messagebox.showerror("Erro", f"Entrada inválida!\nDigite o ponto no formato: (x1,y1)\n{e}")
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1)",parent=self.root )
@@ -476,10 +475,10 @@ class App:
                                 objeto.escalonar(sx, sy)
                                 self.redesenhar()
                                 break
-                            except Exception:
+                            except Exception as e:
                                 messagebox.showerror(
                                     "Erro", 
-                                    "Entrada inválida!\nDigite no formato: (sx,sy)"
+                                    f"Entrada inválida!\nDigite no formato: (sx,sy)\n{e}"
                                 )
                         else:
                             messagebox.showerror(

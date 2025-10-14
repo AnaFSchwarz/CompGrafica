@@ -20,19 +20,25 @@ class ObjetoGrafico3D(ABC):
     #    pass
 
     def _aplicar_transformacao(self, matriz):
-        for p in self.pontos:
-            p.transformar(matriz)
+        print("debug pontos ", self.pontos)
+        novos_pontos = []
+        for (x,y,z) in self.pontos:
+            ponto_h = np.array([x,y,z,1])
+            ponto_trans = (matriz @ ponto_h)
+            novos_pontos.append((ponto_trans[0], ponto_trans[1], ponto_trans[2]))
+        self.pontos = novos_pontos
 
-    def transladar(self, dx, dy, dz):
+    def transladar(self, dx, dy, dz=0):
         matriz = np.array([
             [1, 0, 0, dx],
             [0, 1, 0, dy],
             [0, 0, 1, dz],
             [0, 0, 0, 1]
         ])
+        print("debug transladar matriz ", matriz)
         self._aplicar_transformacao(matriz)
 
-    def escalar(self, sx, sy, sz):
+    def escalonar(self, sx, sy, sz=0):
         matriz = np.array([
             [sx, 0,  0,  0],
             [0,  sy, 0,  0],
@@ -103,10 +109,6 @@ class ObjetoGrafico3D(ABC):
         matriz_total = trans_volta @ matriz_rot @ trans_origem
         self._aplicar_transformacao(matriz_total)
 
-
-
-    #def __repr__(self):
-    #    return "\n".join(str(s) for s in self.segmentos)
 
     def projetar_paralela_ortogonal(self):
         """
