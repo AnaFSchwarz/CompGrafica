@@ -51,72 +51,51 @@ class ObjetoGrafico3D(ABC):
         zs = [p[2] for p in self.pontos]
         return sum(xs)/len(xs), sum(ys)/len(ys), sum(zs)/len(zs)
 
-    def rotacionar(self, angulo, cx=0, cy=0, cz=0):
-        
-        self.rotacionar_x(angulo)
-        self.rotacionar_y(angulo)
-        self.rotacionar_z(angulo)
-        
-    def rotacionar_x(self, angulo):
+    def rotacionar(self, angulo, cx, cy, cz):
+
         a = radians(angulo)
-        matriz = np.array([
-            [1, 0,      0,     0],
+
+        # Matrizes de rotação para cada eixo
+        Rx = np.array([
+            [1, 0,      0,       0],
             [0, cos(a), -sin(a), 0],
             [0, sin(a), cos(a),  0],
-            [0, 0,      0,     1]
-        ])
-        self._aplicar_transformacao(matriz)
+            [0, 0,      0,       1]
+        ], dtype=float)
 
-    def rotacionar_y(self, angulo):
-        a = radians(angulo)
-        matriz = np.array([
+        Ry = np.array([
             [cos(a),  0, sin(a), 0],
-            [0,       1, 0,      0],
+            [0,        1, 0,       0],
             [-sin(a), 0, cos(a), 0],
-            [0,       0, 0,      1]
-        ])
-        self._aplicar_transformacao(matriz)
+            [0,        0, 0,       1]
+        ], dtype=float)
 
-    def rotacionar_z(self, angulo):
-        a = radians(angulo)
-        matriz = np.array([
+        Rz = np.array([
             [cos(a), -sin(a), 0, 0],
-            [sin(a), cos(a),  0, 0],
-            [0,      0,       1, 0],
-            [0,      0,       0, 1]
-        ])
-        self._aplicar_transformacao(matriz)
+            [sin(a),  cos(a), 0, 0],
+            [0,        0,       1, 0],
+            [0,        0,       0, 1]
+        ], dtype=float)
 
-    # ---------- ROTAÇÃO EM TORNO DE EIXO ARBITRÁRIO ----------
-    def rotacionar_em_torno_de_eixo(self, p1, p2, angulo):
-        a = radians(angulo)
-        eixo = np.array([p2.x - p1.x, p2.y - p1.y, p2.z - p1.z])
-        eixo = eixo / np.linalg.norm(eixo)
-        ux, uy, uz = eixo
-
-        c = cos(a)
-        s = sin(a)
-        matriz_rot = np.array([
-            [c + ux**2 * (1 - c),      ux*uy*(1 - c) - uz*s,  ux*uz*(1 - c) + uy*s, 0],
-            [uy*ux*(1 - c) + uz*s,     c + uy**2*(1 - c),     uy*uz*(1 - c) - ux*s, 0],
-            [uz*ux*(1 - c) - uy*s,     uz*uy*(1 - c) + ux*s,  c + uz**2*(1 - c),    0],
+        # Matriz de translação para mover para origem e retornar
+        T_origem = np.array([
+            [1, 0, 0, -cx],
+            [0, 1, 0, -cy],
+            [0, 0, 1, -cz],
             [0, 0, 0, 1]
-        ])
+        ], dtype=float)
 
-        trans_origem = np.array([
-            [1, 0, 0, -p1.x],
-            [0, 1, 0, -p1.y],
-            [0, 0, 1, -p1.z],
+        T_volta = np.array([
+            [1, 0, 0, cx],
+            [0, 1, 0, cy],
+            [0, 0, 1, cz],
             [0, 0, 0, 1]
-        ])
-        trans_volta = np.array([
-            [1, 0, 0, p1.x],
-            [0, 1, 0, p1.y],
-            [0, 0, 1, p1.z],
-            [0, 0, 0, 1]
-        ])
+        ], dtype=float)
 
-        matriz_total = trans_volta @ matriz_rot @ trans_origem
+        # Matriz composta: aplica X depois Y depois Z
+        matriz_total = T_volta @ (Rz @ (Ry @ (Rx @ T_origem)))
+
+        # aplica transformação
         self._aplicar_transformacao(matriz_total)
 
 
