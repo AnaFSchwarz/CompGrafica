@@ -544,7 +544,9 @@ class App:
                 # chama a rotação correta
                 if isinstance(objeto, ObjetoGrafico):
                     objeto.rotacionar(ang, cx, cy)
+                #3D
                 else:
+                    print("debug angulo e coordenadas ", ang, cx, cy, cz)
                     objeto.rotacionar(ang, cx, cy, cz)
                 self.redesenhar()
                 popup.destroy()

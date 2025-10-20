@@ -52,13 +52,10 @@ class ObjetoGrafico3D(ABC):
         return sum(xs)/len(xs), sum(ys)/len(ys), sum(zs)/len(zs)
 
     def rotacionar(self, angulo, cx=0, cy=0, cz=0):
-
-        if cx != 0:
-            self.rotacionar_x(angulo)
-        if cy != 0:
-            self.rotacionar_y(angulo)
-        if cz != 0:
-            self.rotacionar_z(angulo)
+        
+        self.rotacionar_x(angulo)
+        self.rotacionar_y(angulo)
+        self.rotacionar_z(angulo)
         
     def rotacionar_x(self, angulo):
         a = radians(angulo)
