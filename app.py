@@ -13,6 +13,7 @@ from tkinter.colorchooser import askcolor
 import math
 from descritor_obj import DescritorOBJ
 from objeto3D import ObjetoGrafico3D
+from objeto3D import SuperficieBezier
 
 
 class App:
@@ -67,6 +68,7 @@ class App:
         Button(criar_frame, text="Wireframe", width=9, command=lambda: self.executar_objeto("Wireframe")).grid(row=0, column=2, padx=2, pady=2)
         Button(criar_frame, text="Curva", width=6, command=lambda: self.executar_objeto("Curva")).grid(row=1, column=0, padx=2, pady=2)
         Button(criar_frame, text="Objeto3D", width=9, command=lambda: self.executar_objeto("Objeto3D")).grid(row=1, column=1, padx=2, pady=2)
+        Button(criar_frame, text="SupBic", width=9, command=lambda: self.executar_objeto("SupBic")).grid(row=1, column=2, padx=2, pady=2)
         
         # --- Lista de objetos com Scrollbar ---
         Label(menu_frame, text="Objetos criados:", width=35, bg="#255A75", fg="white",
@@ -383,9 +385,150 @@ class App:
                         messagebox.showerror("Erro", f"Entrada inválida!\n{e}")
                 else:
                     messagebox.showerror("Erro", "Você precisa digitar no formato (x1,y1,z1),(x2,y2,z2); ...", parent=self.root)
+            
+        elif tipo == "SupBic":
 
+                self.janela = Toplevel(self.root)
+                self.janela.title("Superfície Bicúbica de Bézier")
+
+                largura, altura = 750, 600
+                x = (self.janela.winfo_screenwidth() - largura) // 2
+                y = (self.janela.winfo_screenheight() - altura) // 2
+                self.janela.geometry(f"{largura}x{altura}+{x}+{y}")
+
+                Label(
+                    self.janela,
+                    text="Insira as coordenadas (x, y, z) para os pontos de controle (16 por matriz):",
+                    font=("Arial", 12, "bold")
+                ).pack(pady=10)
+
+                frame_matrizes = Frame(self.janela)
+                frame_matrizes.pack()
+
+                matrizes_widgets = []  # lista de matrizes 4x4 (cada uma é lista de Entry)
+
+                def adicionar_matriz():
+                    """Cria uma nova grade 4x4 de entradas de pontos."""
+                    frame = LabelFrame(frame_matrizes, text=f"Matriz {len(matrizes_widgets)+1}", padx=10, pady=10)
+                    frame.pack(pady=10)
+
+                    entradas = []
+                    for i in range(4):
+                        linha = []
+                        for j in range(4):
+                            campo = Entry(frame, width=18, font=("Consolas", 10))
+                            campo.insert(0, "0.0, 0.0, 0.0")
+                            campo.grid(row=i, column=j, padx=5, pady=5)
+                            linha.append(campo)
+                        entradas.append(linha)
+                    matrizes_widgets.append(entradas)
+
+                def confirmar():
+                    """Lê as matrizes digitadas e cria a superfície."""
+                    matrizes_controle = []
+
+                    for entradas in matrizes_widgets:
+                        matriz = []
+                        for i in range(4):
+                            linha = []
+                            for j in range(4):
+                                texto = entradas[i][j].get()
+                                try:
+                                    x, y, z = map(float, texto.replace(" ", "").split(","))
+                                    linha.append([x, y, z])
+                                except Exception:
+                                    linha.append([0.0, 0.0, 0.0])
+                            matriz.append(linha)
+                        matrizes_controle.append(matriz)
+
+                    if not matrizes_controle:
+                        print("Nenhuma matriz inserida.")
+                        return
+
+                    try:
+                        sup = SuperficieBezier(
+                            matrizes_controle=matrizes_controle,
+                            cor="blue",
+                            window=self.root
+                        )
+
+                        self.objetos.append(("SuperficieBezier", sup))
+                        self.atualizar_canvas()
+                        print(f"Superfície criada com {len(matrizes_controle)} retalho(s).")
+
+                    except Exception as e:
+                        print("Erro ao criar superfície:", e)
+
+                    self.janela.destroy()
+
+                # --- Botões principais ---
+                botoes_frame = Frame(self.janela)
+                botoes_frame.pack(pady=15)
+
+                Button(
+                    botoes_frame,
+                    text="Adicionar Matriz 4x4",
+                    command=adicionar_matriz,
+                    width=20,
+                    bg="#e0f0ff",
+                    font=("Arial", 10, "bold")
+                ).grid(row=0, column=0, padx=10)
+
+                Button(
+                    botoes_frame,
+                    text="Confirmar Superfície",
+                    command=confirmar,
+                    width=20,
+                    bg="#d0f0d0",
+                    font=("Arial", 10, "bold")
+                ).grid(row=0, column=1, padx=10)
+
+                # Adiciona uma matriz inicial automaticamente
+                adicionar_matriz()
 
         self.redesenhar()
+
+    # Para Superficie Bicubica 3D
+    def adicionar_retalho(self):
+        """Adiciona uma nova matriz 4x4 de entradas."""
+        idx = len(self.matrizes_frames) + 1
+        frame = LabelFrame(self.frame_scroll, text=f"Retalho {idx}", padx=6, pady=6)
+        frame.pack(padx=10, pady=8, fill="x")
+
+        entradas = []
+        for i in range(4):
+            linha = []
+            for j in range(4):
+                e = Entry(frame, width=18, justify="center")
+                e.insert(0, f"{i},{j},0")  # valor inicial padrão
+                e.grid(row=i, column=j, padx=3, pady=3)
+                linha.append(e)
+            entradas.append(linha)
+        self.matrizes_frames.append(entradas)
+
+    #Para superficie bicubica 3D
+    def confirmar(self):
+        """Lê todos os retalhos e envia como lista de matrizes."""
+        todas_matrizes = []
+        try:
+            for entradas in self.matrizes_frames:
+                matriz = []
+                for i in range(4):
+                    linha = []
+                    for j in range(4):
+                        txt = entradas[i][j].get().strip()
+                        x, y, z = map(float, txt.replace("(", "").replace(")", "").split(","))
+                        linha.append((x, y, z))
+                    matriz.append(linha)
+                todas_matrizes.append(matriz)
+
+            # Envia lista de matrizes para o callback
+            #self.callback_confirmar(todas_matrizes)
+            self.self.janela.destroy()
+
+        except Exception as e:
+            messagebox.showerror("Erro", f"Entrada inválida!\nUse o formato: x,y,z\n\nDetalhe: {e}")
+
     
     def selecao_objeto(self, event):
         """Desenha apenas o objeto selecionado na tela"""
