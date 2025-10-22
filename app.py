@@ -7,13 +7,13 @@ from ponto import Ponto
 from reta import Reta
 from wireframe import Wireframe
 from curva import Curva
-from ponto3D import Ponto3D
 from tkinter import simpledialog, messagebox,filedialog
 from tkinter.colorchooser import askcolor
 import math
 from descritor_obj import DescritorOBJ
 from objeto3D import ObjetoGrafico3D
-from objeto3D import SuperficieBezier
+from ponto3D import Ponto3D
+from superficiebicubica import SuperficieBezier
 
 
 class App:
@@ -396,6 +396,8 @@ class App:
                 y = (self.janela.winfo_screenheight() - altura) // 2
                 self.janela.geometry(f"{largura}x{altura}+{x}+{y}")
 
+                #INSERIR CAMPO PARA NOME
+
                 Label(
                     self.janela,
                     text="Insira as coordenadas (x, y, z) para os pontos de controle (16 por matriz):",
@@ -446,15 +448,16 @@ class App:
                         return
 
                     try:
-                        sup = SuperficieBezier(
-                            matrizes_controle=matrizes_controle,
-                            cor="blue",
-                            window=self.root
-                        )
+                        sup = SuperficieBezier( matrizes_controle=matrizes_controle, cor="blue", window=self.root )
 
-                        self.objetos.append(("SuperficieBezier", sup))
-                        self.atualizar_canvas()
-                        print(f"Superfície criada com {len(matrizes_controle)} retalho(s).")
+                        #self.objetos.append(("SuperficieBezier", sup))
+
+                        nome_final = nome_obj or f"SuperficieBicubica{len(self.display_file) + 1}"
+                        self.lista_obj.append((nome_final, sup))
+                        self.display_file.append((nome_final, sup))
+                        self.lista_objetos.insert(END, nome_final)
+                        #self.atualizar_canvas()
+                        print(f"[DEBUG] Superfície criada com {len(matrizes_controle)} retalho(s).")
 
                     except Exception as e:
                         print("Erro ao criar superfície:", e)
@@ -465,23 +468,9 @@ class App:
                 botoes_frame = Frame(self.janela)
                 botoes_frame.pack(pady=15)
 
-                Button(
-                    botoes_frame,
-                    text="Adicionar Matriz 4x4",
-                    command=adicionar_matriz,
-                    width=20,
-                    bg="#e0f0ff",
-                    font=("Arial", 10, "bold")
-                ).grid(row=0, column=0, padx=10)
+                Button( botoes_frame, text="Adicionar Matriz 4x4", command=adicionar_matriz, width=20, bg="#e0f0ff", font=("Arial", 10, "bold")).grid(row=0, column=0, padx=10)
 
-                Button(
-                    botoes_frame,
-                    text="Confirmar Superfície",
-                    command=confirmar,
-                    width=20,
-                    bg="#d0f0d0",
-                    font=("Arial", 10, "bold")
-                ).grid(row=0, column=1, padx=10)
+                Button(botoes_frame,text="Confirmar Superfície",command=confirmar,width=20,bg="#d0f0d0",font=("Arial", 10, "bold")).grid(row=0, column=1, padx=10)
 
                 # Adiciona uma matriz inicial automaticamente
                 adicionar_matriz()
@@ -697,16 +686,7 @@ class App:
             Button(popup, text="Confirmar", command=confirmar).pack(pady=15)
 
     def redesenhar(self):
-        # self.canvas.delete("all")
-        # self.desenhar_eixos()
-        # for nome, obj in self.display_file:
-        #     obj.tipo_clipping = self.tipo_clipping
-        #     obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
-        
-        # for nome, obj in self.display_file3D:
-        #     obj.desenhar(self.canvas, self.canvas_height, self.canvas_width)
 
-        
         self.canvas.delete("all")
         self.desenhar_eixos()
         for nome, obj in self.display_file:
