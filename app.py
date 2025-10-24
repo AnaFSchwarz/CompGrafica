@@ -167,6 +167,7 @@ class App:
         self.importar_obj("3D", filename="CuboMagic1.obj")
         self.importar_obj("3D", filename="Piramide3D6.obj")
         self.importar_obj("3D", filename="Paralelepipedo1.obj")
+        self.importar_obj("3D", filename="SupBicubicaTeste.obj")
 
     def limpar_tela(self):
         self.canvas.delete("all")
@@ -388,92 +389,116 @@ class App:
             
         elif tipo == "SupBic":
 
-                self.janela = Toplevel(self.root)
-                self.janela.title("Superfície Bicúbica de Bézier")
+            # === ETAPA 1: Nome e tamanho ===
+            self.janela = Toplevel(self.root)
+            self.janela.title("Superfície Bicúbica de Bézier - Etapa 1")
 
-                largura, altura = 750, 600
-                x = (self.janela.winfo_screenwidth() - largura) // 2
-                y = (self.janela.winfo_screenheight() - altura) // 2
-                self.janela.geometry(f"{largura}x{altura}+{x}+{y}")
+            largura, altura = 500, 300
+            x = (self.janela.winfo_screenwidth() - largura) // 2
+            y = (self.janela.winfo_screenheight() - altura) // 2
+            self.janela.geometry(f"{largura}x{altura}+{x}+{y}")
 
-                #INSERIR CAMPO PARA NOME
+            Label(
+                self.janela,
+                text="Configuração da Superfície Bicúbica de Bézier",
+                font=("Arial", 14, "bold")
+            ).pack(pady=15)
+
+            frame_config = Frame(self.janela)
+            frame_config.pack(pady=20)
+
+            # Campo para nome do objeto
+            Label(frame_config, text="Nome do objeto (opcional):", font=("Arial", 11)).grid(row=0, column=0, sticky="e", padx=5, pady=5)
+            nome_entry = Entry(frame_config, width=25)
+            nome_entry.grid(row=0, column=1)
+
+            # Menu de opções fixas para tamanho
+            Label(frame_config, text="Tamanho da matriz:", font=("Arial", 11)).grid(row=1, column=0, sticky="e", padx=5, pady=5)
+            tamanhos = [f"{i}x{i}" for i in range(4, 21)]
+            tamanho_var = StringVar(value=tamanhos[0])
+            OptionMenu(frame_config, tamanho_var, *tamanhos).grid(row=1, column=1, pady=5)
+
+            def avancar_para_matriz():
+                """Avança para a segunda etapa: preenchimento da matriz."""
+                nome_obj = nome_entry.get().strip()
+                n = int(tamanho_var.get().split("x")[0])
+
+                self.janela.destroy()
+
+                # === ETAPA 2: Preenchimento da matriz ===
+                janela2 = Toplevel(self.root)
+                janela2.title(f"Superfície Bézier - Etapa 2 ({n}x{n})")
+
+                largura2, altura2 = 900, 700
+                x2 = (janela2.winfo_screenwidth() - largura2) // 2
+                y2 = (janela2.winfo_screenheight() - altura2) // 2
+                janela2.geometry(f"{largura2}x{altura2}+{x2}+{y2}")
 
                 Label(
-                    self.janela,
-                    text="Insira as coordenadas (x, y, z) para os pontos de controle (16 por matriz):",
-                    font=("Arial", 12, "bold")
+                    janela2,
+                    text=f"Preencha os pontos de controle ({n}x{n}):",
+                    font=("Arial", 13, "bold")
                 ).pack(pady=10)
 
-                frame_matrizes = Frame(self.janela)
-                frame_matrizes.pack()
+                frame_matriz = Frame(janela2)
+                frame_matriz.pack(pady=10)
 
-                matrizes_widgets = []  # lista de matrizes 4x4 (cada uma é lista de Entry)
-
-                def adicionar_matriz():
-                    """Cria uma nova grade 4x4 de entradas de pontos."""
-                    frame = LabelFrame(frame_matrizes, text=f"Matriz {len(matrizes_widgets)+1}", padx=10, pady=10)
-                    frame.pack(pady=10)
-
-                    entradas = []
-                    for i in range(4):
-                        linha = []
-                        for j in range(4):
-                            campo = Entry(frame, width=18, font=("Consolas", 10))
-                            campo.insert(0, "0.0, 0.0, 0.0")
-                            campo.grid(row=i, column=j, padx=5, pady=5)
-                            linha.append(campo)
-                        entradas.append(linha)
-                    matrizes_widgets.append(entradas)
+                entradas = []
+                for i in range(n):
+                    linha = []
+                    for j in range(n):
+                        campo = Entry(frame_matriz, width=18, font=("Consolas", 10))
+                        campo.insert(0, "0.0, 0.0, 0.0")
+                        campo.grid(row=i, column=j, padx=3, pady=3)
+                        linha.append(campo)
+                    entradas.append(linha)
 
                 def confirmar():
-                    """Lê as matrizes digitadas e cria a superfície."""
-                    matrizes_controle = []
-
-                    for entradas in matrizes_widgets:
-                        matriz = []
-                        for i in range(4):
-                            linha = []
-                            for j in range(4):
-                                texto = entradas[i][j].get()
-                                try:
-                                    x, y, z = map(float, texto.replace(" ", "").split(","))
-                                    linha.append([x, y, z])
-                                except Exception:
-                                    linha.append([0.0, 0.0, 0.0])
-                            matriz.append(linha)
-                        matrizes_controle.append(matriz)
-
-                    if not matrizes_controle:
-                        print("Nenhuma matriz inserida.")
-                        return
+                    """Lê os pontos e cria a superfície."""
+                    matriz = []
+                    for linha_entries in entradas:
+                        linha = []
+                        for campo in linha_entries:
+                            texto = campo.get()
+                            try:
+                                x, y, z = map(float, texto.replace(" ", "").split(","))
+                                linha.append([x, y, z])
+                            except Exception:
+                                linha.append([0.0, 0.0, 0.0])
+                        matriz.append(linha)
 
                     try:
-                        sup = SuperficieBezier( matrizes_controle=matrizes_controle, cor="blue", window=self.root )
-
-                        #self.objetos.append(("SuperficieBezier", sup))
-
-                        nome_final = nome_obj or f"SuperficieBicubica{len(self.display_file) + 1}"
+                        sup = SuperficieBezier(matrizes_controle=[matriz], cor="blue", window=self.root)
+                        nome_final = nome_obj or f"SuperficieBezier{len(self.display_file) + 1}"
                         self.lista_obj.append((nome_final, sup))
                         self.display_file.append((nome_final, sup))
                         self.lista_objetos.insert(END, nome_final)
-                        #self.atualizar_canvas()
-                        print(f"[DEBUG] Superfície criada com {len(matrizes_controle)} retalho(s).")
-
+                        print(f"[DEBUG] Superfície '{nome_final}' criada ({n}x{n}).")
                     except Exception as e:
                         print("Erro ao criar superfície:", e)
 
-                    self.janela.destroy()
+                    janela2.destroy()
 
-                # --- Botões principais ---
-                botoes_frame = Frame(self.janela)
-                botoes_frame.pack(pady=15)
+                Button(
+                    janela2,
+                    text="Confirmar Superfície",
+                    command=confirmar,
+                    width=20,
+                    bg="#d0f0d0",
+                    font=("Arial", 10, "bold")
+                ).pack(pady=15)
 
-                Button( botoes_frame, text="Adicionar Matriz 4x4", command=adicionar_matriz, width=20, bg="#e0f0ff", font=("Arial", 10, "bold")).grid(row=0, column=0, padx=10)
+            Button(
+                self.janela,
+                text="Avançar para Preenchimento",
+                command=avancar_para_matriz,
+                width=25,
+                bg="#e0f0ff",
+                font=("Arial", 10, "bold")
+            ).pack(pady=25)
 
-                Button(botoes_frame,text="Confirmar Superfície",command=confirmar,width=20,bg="#d0f0d0",font=("Arial", 10, "bold")).grid(row=0, column=1, padx=10)
 
-                # Adiciona uma matriz inicial automaticamente
-                adicionar_matriz()
+                
 
         self.redesenhar()
 
