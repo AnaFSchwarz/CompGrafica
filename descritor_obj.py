@@ -157,11 +157,130 @@ class DescritorOBJ:
                         pass
         return objs
 
-
     def importar3D(self, filename: str, window) -> List[Tuple[str, Any]]:
         """
-        Lê um .obj e retorna lista de (nome, ObjetoGrafico3D) com pontos, arestas e metadados.
+        Lê um arquivo Wavefront .obj e retorna lista de (nome, ObjetoGrafico3D)
+        com vértices, arestas e metadados.
+        Suporta:
+          - o nome_objeto
+          - v, vn, vt
+          - f, l
+          - comentários (#) com metadados
         """
+        verts: List[Tuple[float, float, float]] = []
+        verts_normais: List[Tuple[float, float, float]] = []
+        verts_textura: List[Tuple[float, float]] = []
+        arestas_correntes: List[Tuple[int, int]] = []
+        objs = []
+
+        current_name = None
+        current_color = None
+        current_tipo_clipping = None
+        faces_indices = []
+
+        def flush_pending():
+            """Cria um ObjetoGrafico3D com os dados acumulados."""
+            nonlocal verts, arestas_correntes, objs, current_name, current_color, current_tipo_clipping, faces_indices
+            if not verts:
+                return
+
+            name = current_name or f"Objeto3D{len(objs)+1}"
+            color = current_color or "#00FF00"
+
+            # Gera arestas a partir de faces se necessário
+            for face in faces_indices:
+                for i in range(len(face)):
+                    arestas_correntes.append((face[i], face[(i + 1) % len(face)]))
+
+            obj = ObjetoGrafico3D(list(verts), color, list(arestas_correntes), window)
+
+            if current_tipo_clipping is not None:
+                setattr(obj, "tipo_clipping", current_tipo_clipping)
+
+            objs.append((name, obj))
+
+            # limpa contexto
+            verts = []
+            verts_normais = []
+            verts_textura = []
+            arestas_correntes = []
+            faces_indices = []
+            current_name = None
+            current_color = None
+            current_tipo_clipping = None
+
+        with open(filename, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    # metadados opcionais
+                    if line.startswith('#') and ':' in line:
+                        key, val = line[1:].split(':', 1)
+                        key = key.strip().lower()
+                        val = val.strip()
+                        if key == 'name':
+                            current_name = val
+                        elif key == 'color':
+                            current_color = val
+                        elif key == 'tipo_clipping':
+                            current_tipo_clipping = int(val)
+                    continue
+
+                parts = line.split()
+                cmd = parts[0]
+
+                if cmd == 'o':
+                    # Novo objeto — finaliza o anterior
+                    flush_pending()
+                    current_name = parts[1] if len(parts) > 1 else None
+
+                elif cmd == 'v' and len(parts) >= 4:
+                    try:
+                        verts.append(tuple(map(float, parts[1:4])))
+                    except ValueError:
+                        pass
+
+                elif cmd == 'vn' and len(parts) >= 4:
+                    try:
+                        verts_normais.append(tuple(map(float, parts[1:4])))
+                    except ValueError:
+                        pass
+
+                elif cmd == 'vt' and len(parts) >= 3:
+                    try:
+                        verts_textura.append(tuple(map(float, parts[1:3])))
+                    except ValueError:
+                        pass
+
+                elif cmd == 'l' and len(parts) >= 3:
+                    try:
+                        indices = [int(p.split('/')[0]) - 1 for p in parts[1:]]
+                        for i in range(len(indices) - 1):
+                            arestas_correntes.append((indices[i], indices[i + 1]))
+                    except Exception:
+                        pass
+
+                elif cmd == 'f' and len(parts) >= 4:
+                    face = []
+                    for p in parts[1:]:
+                        try:
+                            v = p.split('/')[0]
+                            idx = int(v) - 1
+                            face.append(idx)
+                        except Exception:
+                            continue
+                    if len(face) >= 3:
+                        faces_indices.append(face)
+
+        # adiciona o último objeto
+        flush_pending()
+        return objs
+
+
+
+"""
+    def importar3D(self, filename: str, window) -> List[Tuple[str, Any]]:
+      
         verts: List[Tuple[float, float, float]] = []
         arestas_correntes: List[Tuple[int, int]] = []
         objs = []
@@ -170,9 +289,7 @@ class DescritorOBJ:
         current_tipo_clipping = None
 
         def flush_pending():
-            """
-            Cria um ObjetoGrafico3D com os vértices e arestas coletadas.
-            """
+         
             nonlocal verts, arestas_correntes, objs, current_name, current_color, current_tipo_clipping
             if not verts:
                 return
@@ -245,3 +362,4 @@ class DescritorOBJ:
 
         return objs
 
+"""

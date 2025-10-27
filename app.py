@@ -87,6 +87,9 @@ class App:
         self.lista_objetos.config(yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.lista_objetos.yview)
 
+        Label(menu_frame, text="*Mexa nos objetos clicando com botão direito", width=35, bg="#E5EAEC", fg="Black",
+            font=("Arial", 10)).pack(pady=(10,2))
+
         # --- Limpar Tela (perto da lista) ---
         Button(menu_frame, text="Limpar Tela", width=20, command=self.limpar_tela).pack(pady=5)
 
@@ -161,13 +164,15 @@ class App:
         Button(final_frame, text="Importar 3D", width=12, command=partial(self.importar_obj, "3D")).pack(side='left', padx=4)
         
         # CRIA OBJETOS BÁSICOS:
-        self.importar_obj("2D", filename="Ponto2.obj")
-        self.importar_obj("2D", filename="Reta2.obj")
-        self.importar_obj("2D", filename="Casa2.obj")
+        #self.importar_obj("2D", filename="Ponto2.obj")
+        #self.importar_obj("2D", filename="Reta2.obj")
+        #self.importar_obj("2D", filename="Casa2.obj")
         self.importar_obj("3D", filename="CuboMagic1.obj")
         self.importar_obj("3D", filename="Piramide3D6.obj")
         self.importar_obj("3D", filename="Paralelepipedo1.obj")
         self.importar_obj("3D", filename="SupBicubicaTeste.obj")
+        self.importar_obj("3D", filename="Xicara2.obj")
+        self.importar_obj("3D", filename="diamante2.obj")
 
     def limpar_tela(self):
         self.canvas.delete("all")
@@ -721,6 +726,7 @@ class App:
                 for (x1, y1), (x2, y2) in proj:
                     xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
                     xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
+                    print("DEBUG 3D nome e cor " , obj.cor)
                     self.canvas.create_line(xv1, yv1, xv2, yv2, fill=obj.cor, width=2)
             else:
                 obj.tipo_clipping = self.tipo_clipping
