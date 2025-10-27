@@ -1,4 +1,4 @@
-# Trabalho 1.1 - Sistema básico com Window e Viewport
+# Trabalho 1.10 - Sistema básico com Window e Viewport
 ## Autoras: Ana Flávia Schwarz e Julia Fischer Gazolla
 
 A execução principal desse projeto é feita pelo arquivo `main.py`.
