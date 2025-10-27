@@ -12,11 +12,6 @@ class Curva(ObjetoGrafico):
 
     def desenhar(self, canvas, window, scn, viewport):
 
-        # Para curvas Bezier
-        #if len(self.pontos) == 4:
-        #    self.segmentos = []
-        #    self.adicionar_curva(self.pontos)
-
         # Não altera self.pontos
         self.todos_pontos()
 

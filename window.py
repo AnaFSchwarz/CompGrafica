@@ -39,18 +39,21 @@ class Window():
     def zoom(self, fator_per):
         """
         Redefine a window a partir do zoom percentual.
-        - fator_per = 0   → window original
-        - fator_per > 0   → zoom in (aproxima, diminui janela)
-        - fator_per < 0   → zoom out (afasta, aumenta janela)
+        - fator_per = 15  → window original (escala 1.0)
+        - fator_per > 15  → zoom out (afasta, aumenta janela)
+        - fator_per < 15  → zoom in (aproxima, reduz janela)
+        - fator_per = 0   → zoom máximo (reduz bastante a tela)
         """
+
         largura_base = self.base_xmax - self.base_xmin
         altura_base  = self.base_ymax - self.base_ymin
 
-        # inverter lógica: positivo reduz, negativo amplia
-        fator = 1 - (fator_per / 100.0)
+        # Ajuste: fator_per=25 → fator=1.0
+        fator = 1 + ((25 - fator_per) / 100.0)
 
-        if fator <= 0:
-            fator = 0.01  # evita tamanho zero ou negativo
+        # Evita fator zero ou negativo
+        if fator <= 0.01:
+            fator = 0.01
 
         largura = largura_base * fator
         altura  = altura_base * fator
@@ -62,6 +65,7 @@ class Window():
         self.xmax = cx + largura / 2
         self.ymin = cy - altura / 2
         self.ymax = cy + altura / 2
+
 
 
 

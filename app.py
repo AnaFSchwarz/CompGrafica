@@ -20,16 +20,13 @@ class App:
     def __init__(self):
         self.root = Tk()
         self.root.title("Sistema Gráfico Interativo 2D")
-        try:
-            self.root.state('zoomed')
-        except:
-            self.root.attributes('-zoomed', True)
+        self.root.geometry("1050x750")
 
         # Canvas
         self.canvas_width = 750
         self.canvas_height = 700
         self.canvas = Canvas(self.root, width=self.canvas_width, height=self.canvas_height, bg="white")
-        self.canvas.pack(side="right", fill="both", expand=True)
+        self.canvas.pack(side="right", fill="both", expand=False)
         self.descritor = DescritorOBJ()
 
         # Window e Viewport
@@ -53,8 +50,6 @@ class App:
     def _criar_menu(self):
         menu_frame = Frame(self.root, bg="#F0F4F8", width=250)
         menu_frame.pack(side="left", fill="y")
-
-        self.desenhar_eixos()
 
         # --- Criar objeto ---
         Label(menu_frame, text="Criar Objeto:", width=35, bg="#255A75", fg="white",
@@ -87,7 +82,7 @@ class App:
         self.lista_objetos.config(yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.lista_objetos.yview)
 
-        Label(menu_frame, text="*Mexa nos objetos clicando com botão direito", width=35, bg="#E5EAEC", fg="Black",
+        Label(menu_frame, text="* Altere nos objetos clicando com botão direito *", width=35, bg="#E5EAEC", fg="Black",
             font=("Arial", 10)).pack(pady=(10,2))
 
         # --- Limpar Tela (perto da lista) ---
@@ -101,15 +96,15 @@ class App:
         movimento_frame.pack(pady=2, padx=5)
 
         # Mantendo padrão maior e centralizado
-        Button(movimento_frame, text="CIMA", width=12, height=2,
+        Button(movimento_frame, text="CIMA", width=12, height=1,
             command=lambda: self.mover_window(0, self.window.get_tam()/8)).grid(row=0, column=1, padx=2, pady=2)
-        Button(movimento_frame, text="ESQUERDA", width=12, height=2,
+        Button(movimento_frame, text="ESQUERDA", width=12, height=1,
             command=lambda: self.mover_window(-self.window.get_tam()/8,0)).grid(row=1, column=0, padx=2, pady=2)
-        Button(movimento_frame, text="CENTRALIZAR", width=12, height=2,
+        Button(movimento_frame, text="CENTRALIZAR", width=12, height=1,
             command=self.centralizar_window).grid(row=1, column=1, padx=2, pady=2)
-        Button(movimento_frame, text="DIREITA", width=12, height=2,
+        Button(movimento_frame, text="DIREITA", width=12, height=1,
             command=lambda: self.mover_window(self.window.get_tam()/8,0)).grid(row=1, column=2, padx=2, pady=2)
-        Button(movimento_frame, text="BAIXO", width=12, height=2,
+        Button(movimento_frame, text="BAIXO", width=12, height=1,
             command=lambda: self.mover_window(0,-self.window.get_tam()/8)).grid(row=2, column=1, padx=2, pady=2)
 
         # --- Zoom ---
@@ -117,23 +112,24 @@ class App:
             font=("Arial", 10, "bold")).pack(pady=(10,2))
 
         zoom_frame = Frame(menu_frame, bg="#F0F4F8")
-        zoom_frame.pack(pady=2, padx=5, fill='x')
+        zoom_frame.pack(pady=2, padx=2, fill='x')
 
-        self.zoom_entry = Entry(zoom_frame, width=15)
-        self.zoom_entry.insert(0,"0")
-        self.zoom_entry.pack(side='left', padx=5)
-        Button(zoom_frame, text="Aplicar Zoom", width=15, command=self.aplicar_zoom).pack(side='left', padx=2)
+        # Barra deslizante de 0 a 100, valor inicial 15
+        self.zoom_var = IntVar(value=15)
+        self.zoom_scale = Scale(zoom_frame, from_=0, to=100, orient='horizontal', variable=self.zoom_var, bg="#F0F4F8", highlightthickness=0,troughcolor="#d0e0ea",           length=180,
+            command=lambda val: self.redesenhar())
+        self.zoom_scale.pack(side='left', padx=5, fill='x', expand=True)
 
         # --- Rotação Window ---
         Label(menu_frame, text="Rotação Window:", width=35, bg="#255A75", fg="white",
             font=("Arial", 10, "bold")).pack(pady=(10,2))
 
         rotation_frame = Frame(menu_frame, bg="#F0F4F8")
-        rotation_frame.pack(pady=2, padx=5)
+        rotation_frame.pack(pady=1, padx=5)
 
-        Button(rotation_frame, text="↶", width=6, height=2,
+        Button(rotation_frame, text="↶", width=6, height=1,
             command=lambda: self.rotacionar_window("botao_esquerda")).grid(row=0, column=0, padx=2, pady=2)
-        Button(rotation_frame, text="↷", width=6, height=2,
+        Button(rotation_frame, text="↷", width=6, height=1,
             command=lambda: self.rotacionar_window("botao_direita")).grid(row=0, column=1, padx=2, pady=2)
         self.angulo_var = StringVar(value=f"{self.window.angulo:.1f}°")
         Label(rotation_frame, textvariable=self.angulo_var, bg="#F0F4F8").grid(row=1, column=0, columnspan=2, pady=2)
@@ -163,10 +159,13 @@ class App:
         Button(final_frame, text="Importar 2D", width=12, command=partial(self.importar_obj, "2D")).pack(side='left', padx=2)
         Button(final_frame, text="Importar 3D", width=12, command=partial(self.importar_obj, "3D")).pack(side='left', padx=4)
         
+        
+        self.desenhar_eixos()
+
         # CRIA OBJETOS BÁSICOS:
-        #self.importar_obj("2D", filename="Ponto2.obj")
-        #self.importar_obj("2D", filename="Reta2.obj")
-        #self.importar_obj("2D", filename="Casa2.obj")
+        self.importar_obj("2D", filename="Ponto2.obj")
+        self.importar_obj("2D", filename="Reta2.obj")
+        self.importar_obj("2D", filename="Casa2.obj")
         self.importar_obj("3D", filename="CuboMagic1.obj")
         self.importar_obj("3D", filename="Piramide3D6.obj")
         self.importar_obj("3D", filename="Paralelepipedo1.obj")
@@ -186,25 +185,6 @@ class App:
     def centralizar_window(self):
         self.window.centralizar()
         self.redesenhar()
-
-    def aplicar_zoom(self):
-
-        try:
-            valor = self.zoom_entry.get().strip()
-            # Verifica se é número inteiro
-            fator = int(valor)
-            # Verifica se está no intervalo permitido
-            if 0 <= fator <= 100:
-                self.window.zoom(fator)
-                self.redesenhar()
-            else:
-                messagebox.showerror(
-                    "Erro", "Digite um número inteiro entre 0 e 100.",
-                    parent=self.root)
-
-        except ValueError:
-            messagebox.showerror( "Erro", "Digite um número inteiro válido, entre 0 e 100.",
-                parent=self.root)
             
     def rotacionar_window(self, direcao_botao):
 
@@ -221,7 +201,6 @@ class App:
 
         self.redesenhar()
             
-
     def executar_objeto(self, tipo):
         if tipo == "Ponto":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o ponto:", parent=self.root)
@@ -708,7 +687,6 @@ class App:
                     objeto.rotacionar(ang, cx, cy)
                 #3D
                 else:
-                    print("debug angulo e coordenadas ", ang, cx, cy, cz)
                     objeto.rotacionar(ang, cx, cy, cz)
                 self.redesenhar()
                 popup.destroy()
@@ -722,19 +700,18 @@ class App:
         for nome, obj in self.display_file:
             if isinstance(obj, ObjetoGrafico3D):
                 # projeção ortogonal do 3D para 2D
-                proj = obj.projetar_paralela_ortogonal()
-                for (x1, y1), (x2, y2) in proj:
-                    xv1, yv1 = self.scn.world_to_scn_to_viewport(x1, y1, self.window, self.viewport)
-                    xv2, yv2 = self.scn.world_to_scn_to_viewport(x2, y2, self.window, self.viewport)
-                    print("DEBUG 3D nome e cor " , obj.cor)
-                    self.canvas.create_line(xv1, yv1, xv2, yv2, fill=obj.cor, width=2)
+                obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
             else:
                 obj.tipo_clipping = self.tipo_clipping
                 obj.desenhar(self.canvas, self.window, self.scn, self.viewport)
 
     def desenhar_eixos(self):
-        ang = math.radians(self.window.angulo)
 
+        #aplicar zoom
+        fator = self.zoom_var.get()
+        self.window.zoom(fator)
+
+        ang = math.radians(self.window.angulo)
         # matriz de rotação
         cos_a = math.cos(ang)
         sin_a = math.sin(ang)
