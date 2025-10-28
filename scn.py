@@ -1,12 +1,3 @@
-# Região normalizada
-
-# scn.py
-"""
-Módulo SCN - Sistema de Coordenadas Normalizado
-
-Responsável por mapear coordenadas do mundo (WC, definidas pela Window)
-para o Sistema de Coordenadas Normalizado (SCN), no intervalo [0,1] x [0,1].
-"""
 
 class SCN:
     def __init__(self):

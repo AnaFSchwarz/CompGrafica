@@ -35,7 +35,7 @@ class Reta(ObjetoGrafico):
         xmin, xmax, ymin, ymax = window.base_xmin, window.base_xmax, window.base_ymin, window.base_ymax
 
         if self.tipo_clipping.get() == 1:
-            """ Algoritmo de Cohen–Sutherland """
+            # Algoritmo de Cohen–Sutherland 
             outcode1 = self._compute_outcode(x1, y1, window)
             outcode2 = self._compute_outcode(x2, y2, window)
             aceito = False
@@ -75,7 +75,7 @@ class Reta(ObjetoGrafico):
             return aceito, (x1, y1, x2, y2)
         
         else:
-            """ Algoritmo Liang–Barsky line clipping.  """
+            # Algoritmo Liang–Barsky line clipping
             dx = x2 - x1
             dy = y2 - y1
 

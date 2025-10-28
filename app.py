@@ -14,19 +14,23 @@ from descritor_obj import DescritorOBJ
 from objeto3D import ObjetoGrafico3D
 from ponto3D import Ponto3D
 from superficiebicubica import SuperficieBezier
+from functools import partial
 
 
 class App:
     def __init__(self):
         self.root = Tk()
-        self.root.title("Sistema Gráfico Interativo 2D")
-        self.root.geometry("1050x750")
+        self.root.title("Sistema Gráfico Interativo 2D - Grupo 2")
+        try:
+            self.root.state('zoomed')
+        except:
+            self.root.attributes('-zoomed', True)
 
         # Canvas
         self.canvas_width = 750
         self.canvas_height = 700
         self.canvas = Canvas(self.root, width=self.canvas_width, height=self.canvas_height, bg="white")
-        self.canvas.pack(side="right", fill="both", expand=False)
+        self.canvas.pack(side="right", fill="both", expand=True)
         self.descritor = DescritorOBJ()
 
         # Window e Viewport
@@ -82,8 +86,8 @@ class App:
         self.lista_objetos.config(yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.lista_objetos.yview)
 
-        Label(menu_frame, text="* Altere nos objetos clicando com botão direito *", width=35, bg="#E5EAEC", fg="Black",
-            font=("Arial", 10)).pack(pady=(10,2))
+        Label(menu_frame, text="* Altere os objetos clicando com botão direito *", width=35, bg="#E5EAEC", fg="Black",
+            font=("Arial", 10)).pack(pady=(20,2))
 
         # --- Limpar Tela (perto da lista) ---
         Button(menu_frame, text="Limpar Tela", width=20, command=self.limpar_tela).pack(pady=5)
@@ -139,7 +143,7 @@ class App:
             font=("Arial", 10, "bold")).pack(pady=(10,2))
         self.tipo_clipping = IntVar(value=1)
         clipping_frame = Frame(menu_frame, bg="white")
-        clipping_frame.pack(pady=(2,10), anchor="w")  # fica colado ao título e alinhado à esquerda
+        clipping_frame.pack(pady=(2,10), anchor="w")  
 
         Radiobutton(clipping_frame, text="Cohen-Sutherland",
                     variable=self.tipo_clipping, value=1,
@@ -153,25 +157,24 @@ class App:
         # --- Importar 2D e 3D ---
         final_frame = Frame(menu_frame, bg="#F0F4F8")
         final_frame.pack(side='bottom', pady=10, padx=5, fill='x')
-
-        from functools import partial
-
-        Button(final_frame, text="Importar 2D", width=12, command=partial(self.importar_obj, "2D")).pack(side='left', padx=2)
-        Button(final_frame, text="Importar 3D", width=12, command=partial(self.importar_obj, "3D")).pack(side='left', padx=4)
-        
+        Button(final_frame, text="Importar 2D", width=12, command=partial(self.importar_obj, "2D", acao="clique")).pack(side='left', padx=2)
+        Button(final_frame, text="Importar 3D", width=12, command=partial(self.importar_obj, "3D",  acao="clique")).pack(side='left', padx=4)
         
         self.desenhar_eixos()
 
-        # CRIA OBJETOS BÁSICOS:
-        self.importar_obj("2D", filename="Ponto2.obj")
-        self.importar_obj("2D", filename="Reta2.obj")
-        self.importar_obj("2D", filename="Casa2.obj")
-        self.importar_obj("3D", filename="CuboMagic1.obj")
-        self.importar_obj("3D", filename="Piramide3D6.obj")
-        self.importar_obj("3D", filename="Paralelepipedo1.obj")
-        self.importar_obj("3D", filename="SupBicubicaTeste.obj")
-        self.importar_obj("3D", filename="Xicara2.obj")
-        self.importar_obj("3D", filename="diamante2.obj")
+        self.criar_objetos_basicos()
+
+    def criar_objetos_basicos(self):
+
+        self.importar_obj("2D", filename="objetos_criados/Ponto2.obj")
+        self.importar_obj("2D", filename="objetos_criados/Reta2.obj")
+        self.importar_obj("2D", filename="objetos_criados/Casa2.obj")
+        self.importar_obj("3D", filename="objetos_criados/CuboMagic1.obj")
+        self.importar_obj("3D", filename="objetos_criados/Piramide3D6.obj")
+        self.importar_obj("3D", filename="objetos_criados/Paralelepipedo2.obj")
+        self.importar_obj("3D", filename="objetos_criados/SupBicubicaTeste.obj")
+        self.importar_obj("3D", filename="objetos_criados/Xicara2.obj")
+        self.importar_obj("3D", filename="objetos_criados/diamante2.obj")
 
     def limpar_tela(self):
         self.canvas.delete("all")
@@ -261,6 +264,7 @@ class App:
                 else:
                         # Se o usuário só apertar Enter sem digitar nada
                     messagebox.showerror( "Erro", "Você precisa digitar no formato (x1,y1),(x2,y2).",parent=self.root )
+
         elif tipo == "Wireframe":            
             nome_obj = simpledialog.askstring("Nome do objeto", "Digite um nome para o wireframe:", parent=self.root)
             if nome_obj is None:  
@@ -373,7 +377,7 @@ class App:
             
         elif tipo == "SupBic":
 
-            # === ETAPA 1: Nome e tamanho ===
+            #  ETAPA 1: Nome e tamanho 
             self.janela = Toplevel(self.root)
             self.janela.title("Superfície Bicúbica de Bézier - Etapa 1")
 
@@ -391,7 +395,6 @@ class App:
             frame_config = Frame(self.janela)
             frame_config.pack(pady=20)
 
-            # Campo para nome do objeto
             Label(frame_config, text="Nome do objeto (opcional):", font=("Arial", 11)).grid(row=0, column=0, sticky="e", padx=5, pady=5)
             nome_entry = Entry(frame_config, width=25)
             nome_entry.grid(row=0, column=1)
@@ -403,13 +406,13 @@ class App:
             OptionMenu(frame_config, tamanho_var, *tamanhos).grid(row=1, column=1, pady=5)
 
             def avancar_para_matriz():
-                """Avança para a segunda etapa: preenchimento da matriz."""
+                #Avança para a segunda etapa: preenchimento da matriz.
                 nome_obj = nome_entry.get().strip()
                 n = int(tamanho_var.get().split("x")[0])
 
                 self.janela.destroy()
 
-                # === ETAPA 2: Preenchimento da matriz ===
+                #  ETAPA 2: Preenchimento da matriz
                 janela2 = Toplevel(self.root)
                 janela2.title(f"Superfície Bézier - Etapa 2 ({n}x{n})")
 
@@ -438,7 +441,7 @@ class App:
                     entradas.append(linha)
 
                 def confirmar():
-                    """Lê os pontos e cria a superfície."""
+                    #Lê os pontos e cria a superfície
                     matriz = []
                     for linha_entries in entradas:
                         linha = []
@@ -457,38 +460,21 @@ class App:
                         self.lista_obj.append((nome_final, sup))
                         self.display_file.append((nome_final, sup))
                         self.lista_objetos.insert(END, nome_final)
-                        print(f"[DEBUG] Superfície '{nome_final}' criada ({n}x{n}).")
+                        
                     except Exception as e:
                         print("Erro ao criar superfície:", e)
 
                     janela2.destroy()
 
-                Button(
-                    janela2,
-                    text="Confirmar Superfície",
-                    command=confirmar,
-                    width=20,
-                    bg="#d0f0d0",
-                    font=("Arial", 10, "bold")
-                ).pack(pady=15)
+                Button(janela2,text="Confirmar Superfície",command=confirmar,width=20,bg="#d0f0d0",font=("Arial", 10, "bold")).pack(pady=15)
 
-            Button(
-                self.janela,
-                text="Avançar para Preenchimento",
-                command=avancar_para_matriz,
-                width=25,
-                bg="#e0f0ff",
-                font=("Arial", 10, "bold")
-            ).pack(pady=25)
-
-
-                
+            Button(self.janela,text="Avançar para Preenchimento",command=avancar_para_matriz,width=25,bg="#e0f0ff",font=("Arial", 10, "bold")).pack(pady=25)
 
         self.redesenhar()
 
     # Para Superficie Bicubica 3D
     def adicionar_retalho(self):
-        """Adiciona uma nova matriz 4x4 de entradas."""
+        #Adiciona uma nova matriz 4x4 de entradas
         idx = len(self.matrizes_frames) + 1
         frame = LabelFrame(self.frame_scroll, text=f"Retalho {idx}", padx=6, pady=6)
         frame.pack(padx=10, pady=8, fill="x")
@@ -506,7 +492,7 @@ class App:
 
     #Para superficie bicubica 3D
     def confirmar(self):
-        """Lê todos os retalhos e envia como lista de matrizes."""
+        #Lê todos os retalhos e envia como lista de matrizes
         todas_matrizes = []
         try:
             for entradas in self.matrizes_frames:
@@ -520,8 +506,6 @@ class App:
                     matriz.append(linha)
                 todas_matrizes.append(matriz)
 
-            # Envia lista de matrizes para o callback
-            #self.callback_confirmar(todas_matrizes)
             self.self.janela.destroy()
 
         except Exception as e:
@@ -529,7 +513,7 @@ class App:
 
     
     def selecao_objeto(self, event):
-        """Desenha apenas o objeto selecionado na tela"""
+        #Desenha apenas o objeto selecionado na tela
         idx = self.lista_objetos.curselection()
         if not idx:
             return
@@ -542,17 +526,15 @@ class App:
                 break
 
     def selecao_menu_objeto(self, event):
-        """Abre menu do objeto ao clicar nele com botão direito"""
+        #Abre menu do objeto ao clicar nele com botão direito
 
         idx = self.lista_objetos.nearest(event.y)  # descobre em qual item foi clicado
         if idx >= 0:
             self.lista_objetos.selection_clear(0, END)
             self.lista_objetos.selection_set(idx)
             self.lista_objetos.activate(idx)
-
             nome = self.lista_objetos.get(idx)
-
-                    # Recupera o objeto associado a esse nome
+            # Recupera o objeto associado a esse nome
             objeto = None
             for nome_obj, obj in self.lista_obj:
                 if nome_obj == nome:
@@ -622,7 +604,7 @@ class App:
 
             popup = Toplevel(self.root)
             popup.title("Escolha uma opção de rotação")
-            popup.geometry("300x250")
+            popup.geometry("300x400")
 
             escolha_var = StringVar(value="op1")
 
@@ -771,7 +753,7 @@ class App:
                 messagebox.showerror("Erro", f"Falha ao exportar:\n{e}")
     
 
-    def importar_obj(self, botao, filename=None):
+    def importar_obj(self, botao, filename=None, acao=None):
 
         if filename is None:
             filename = filedialog.askopenfilename(filetypes=[("Wavefront OBJ", "*.obj")])
@@ -787,7 +769,8 @@ class App:
                 self.display_file.append((nome, obj))
                 self.lista_objetos.insert(END, nome)
             self.redesenhar()
-            messagebox.showinfo("Importar", f"{len(objs_importados)} objeto importado com sucesso.")
+            if (acao is not None):
+                messagebox.showinfo("Importar", f"{len(objs_importados)} objeto importado com sucesso.")
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao importar 3D:\n{e}")
 

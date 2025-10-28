@@ -50,7 +50,7 @@ class Curva(ObjetoGrafico):
         return pts
 
     def _pontos_bspline_fd(self, p0, p1, p2, p3):
-        """Gera pontos de um segmento B-Spline cúbica usando Forward Differences"""
+        # Gera pontos de um segmento B-Spline cúbica usando Forward Differences
         # matriz base da B-Spline cúbica
         M = (1/6) * np.array([
             [-1,  3, -3, 1],
@@ -94,7 +94,7 @@ class Curva(ObjetoGrafico):
         return pontos
 
     def todos_pontos(self):
-        """Gera os pontos da curva B-Spline a partir de todos os segmentos."""
+        #Gera os pontos da curva B-Spline a partir de todos os segmentos. 
         all_pts = []
         n = len(self.pontos)
         if n < 4:

@@ -24,7 +24,7 @@ class SuperficieBezier(ObjetoGrafico3D):
         super().__init__(pontos, cor, arestas, window, tipo_objeto="BEZIER", tipo_clipping=tipo_clipping)
     
     def _bernstein(self, i, t):
-        """Calcula o polinômio de Bernstein cúbico"""
+        #Calcula o polinômio de Bernstein cúbico
         coefs = [
             [1, 0, 0, 0],
             [-3, 3, 0, 0],
@@ -51,7 +51,7 @@ class SuperficieBezier(ObjetoGrafico3D):
         return tuple(ponto)
     
     def _gerar_malha(self):
-        """Gera a malha de pontos e arestas para todas as superfícies"""
+         #Gera a malha de pontos e arestas para todas as superfícies
         todos_pontos = []
         todas_arestas = []
         offset = 0
@@ -88,7 +88,7 @@ class SuperficieBezier(ObjetoGrafico3D):
         return todos_pontos, todas_arestas
     
     def desenhar(self, canvas, largura, altura, cor=None):
-        """Desenha a superfície usando projeção ortogonal"""
+         #Desenha a superfície usando projeção ortogonal
         cor_desenho = cor if cor else self.cor
         
         # Projeta os segmentos
@@ -104,7 +104,7 @@ class SuperficieBezier(ObjetoGrafico3D):
             canvas.create_line(px1, py1, px2, py2, fill=cor_desenho, width=1)
     
     def atualizar_malha(self):
-        """Recalcula a malha após transformações nos pontos de controle"""
+         #Recalcula a malha após transformações nos pontos de controle
         pontos, arestas = self._gerar_malha()
         self.pontos = [(x/100, y/100, z/100) for (x, y, z) in pontos]
         self.arestas = arestas

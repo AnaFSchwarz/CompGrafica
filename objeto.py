@@ -25,10 +25,6 @@ class ObjetoGrafico(ABC):
     
     def multiplicacao_matrizes(self, Matriz):
         novos_pontos = []
-        
-        # Para Curva em Bezier
-        #if self.tipo_objeto == "Curva":
-        #    self.pontos = self.segmentos[0]
 
         for (x, y) in self.pontos:
             # ponto como vetor linha

@@ -10,9 +10,8 @@ class DescritorOBJ:
 
     # ---------- Escrita ----------
     def exportar_2D(self, objeto_selecionado, nome, filename: str):
-        """
-        Gera um .obj com todos os vértices e linhas (l) por objeto.
-        """
+        # Gera um .obj com todos os vértices e linhas (l) por objeto.
+        
         vertices = []  # lista global de (x,y)
         object_blocks = []
 
@@ -88,7 +87,7 @@ class DescritorOBJ:
             # Cabeçalho do objeto
             f.write(f"o {nome}\n")
 
-    # ---------- Leitura ----------
+    #  Leitura 
     def importar2D(self, filename: str, window) -> List[Tuple[str, Any]]:
         """
         Lê um .obj e retorna lista de (nome, objeto) usando Ponto, Reta ou Wireframe.
@@ -158,15 +157,7 @@ class DescritorOBJ:
         return objs
 
     def importar3D(self, filename: str, window) -> List[Tuple[str, Any]]:
-        """
-        Lê um arquivo Wavefront .obj e retorna lista de (nome, ObjetoGrafico3D)
-        com vértices, arestas e metadados.
-        Suporta:
-          - o nome_objeto
-          - v, vn, vt
-          - f, l
-          - comentários (#) com metadados
-        """
+      
         verts: List[Tuple[float, float, float]] = []
         verts_normais: List[Tuple[float, float, float]] = []
         verts_textura: List[Tuple[float, float]] = []
@@ -179,7 +170,7 @@ class DescritorOBJ:
         faces_indices = []
 
         def flush_pending():
-            """Cria um ObjetoGrafico3D com os dados acumulados."""
+            #Cria um ObjetoGrafico3D com os dados acumulados
             nonlocal verts, arestas_correntes, objs, current_name, current_color, current_tipo_clipping, faces_indices
             if not verts:
                 return
@@ -276,90 +267,3 @@ class DescritorOBJ:
         flush_pending()
         return objs
 
-
-
-"""
-    def importar3D(self, filename: str, window) -> List[Tuple[str, Any]]:
-      
-        verts: List[Tuple[float, float, float]] = []
-        arestas_correntes: List[Tuple[int, int]] = []
-        objs = []
-        current_name = None
-        current_color = None
-        current_tipo_clipping = None
-
-        def flush_pending():
-         
-            nonlocal verts, arestas_correntes, objs, current_name, current_color, current_tipo_clipping
-            if not verts:
-                return
-
-            name = current_name or f"Objeto3D{len(objs)+1}"
-            color = current_color or "#000000"
-
-            obj = ObjetoGrafico3D(list(verts), color, list(arestas_correntes), window)
-
-            if current_tipo_clipping is not None:
-                setattr(obj, "tipo_clipping", current_tipo_clipping)
-
-            objs.append((name, obj))
-
-            # Reseta listas e contexto
-            verts = []
-            arestas_correntes = []
-            current_name = None
-            current_color = None
-            current_tipo_clipping = None
-
-        with open(filename, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-
-                # Comentários com metadados
-                if line.startswith('#'):
-                    if ':' in line:
-                        key, val = line[1:].split(':', 1)
-                        key = key.strip().lower()
-                        val = val.strip()
-                        if key == 'name':
-                            current_name = val
-                        elif key == 'color':
-                            current_color = val
-                        elif key == 'tipo_clipping':
-                            current_tipo_clipping = int(val)
-                    continue
-
-                parts = line.split()
-                if not parts:
-                    continue
-
-                # Vértices
-                if parts[0] == 'v' and len(parts) >= 4:
-                    try:
-                        x, y, z = map(float, parts[1:4])
-                        verts.append((x, y, z))
-                    except ValueError:
-                        continue
-
-                # Linhas (arestas)
-                elif parts[0] == 'l':
-                    try:
-                        indices = [int(x) - 1 for x in parts[1:]]  # converte para 0-based
-                        # Cria pares consecutivos como arestas
-                        for i in range(len(indices) - 1):
-                            arestas_correntes.append((indices[i], indices[i+1]))
-                    except Exception:
-                        continue
-
-                # Quando encontrar novo objeto, finaliza o anterior
-                elif parts[0] == 'o':
-                    flush_pending()
-
-            # Garante que o último objeto seja adicionado
-            flush_pending()
-
-        return objs
-
-"""
